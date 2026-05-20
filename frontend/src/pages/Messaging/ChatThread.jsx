@@ -133,7 +133,7 @@ export default function ChatThread() {
                     disabled={!newMessage.trim()}
                     className={`p-2 rounded-full transition-colors ${
                         newMessage.trim() 
-                        ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] cursor-pointer' 
+                        ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] hover:bg-[var(--color-primary-hover)] cursor-pointer' 
                         : 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)] cursor-not-allowed'
                     }`}
                 >

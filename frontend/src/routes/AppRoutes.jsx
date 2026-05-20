@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Home from '../pages/Home';
 import Saved from '../pages/Saved';
-import UserProfile from '../pages/UserProfile';
+import UserProfile from '../pages/user/UserProfile';
 import UserRegister from '../pages/user/UserRegister';
 import UserLogin from '../pages/user/UserLogin';
+import EditUserProfile from '../pages/user/EditUserProfile';
 import FoodPartnerRegister from '../pages/food-partner/FoodPartnerRegister';
 import FoodPartnerLogin from '../pages/food-partner/FoodPartnerLogin';
 import FoodPartnerProfile from '../pages/food-partner/FoodPartnerProfile';
@@ -27,25 +28,21 @@ function AppRoutes() {
         <Route path='/food-partner/register' element={<FoodPartnerRegister />} />
         <Route path='/food-partner/login' element={<FoodPartnerLogin />} />
 
-        {/* Public Content Routes with Navigation Layout */}
-        {/* Currently making Home and Saved "public" so you can visually test without navigating auth first */}
-        <Route element={<Layout />}>
-          <Route path='/' element={<Home />} />
-          <Route path='/search' element={<Search />} />
-          <Route path='/saved' element={<Saved />} />
-          <Route path='/messages' element={<Inbox />} />
-          <Route path='/food-partner/:id' element={<FoodPartnerProfile />} />
-        </Route>
-
-        {/* ChatThread has its own custom TopBar + input bar, no BottomNav needed */}
-        <Route path='/messages/:conversationId' element={<ChatThread />} />
-
-        {/* Protected Routes requiring Authentication + Layout */}
+        {/* Protected Routes requiring Authentication */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path='/profile' element={<UserProfile />} />
+            <Route path='/' element={<Home />} />
+            <Route path='/search' element={<Search />} />
+            <Route path='/saved' element={<Saved />} />
+            <Route path='/messages' element={<Inbox />} />
+            <Route path='/food-partner/:id' element={<FoodPartnerProfile />} />
+            <Route path='/user/profile' element={<UserProfile />} />
+            <Route path='/user/profile/edit' element={<EditUserProfile />} />
+            <Route path='/food-partner/profile' element={<FoodPartnerProfile />} />
             <Route path='/create-food' element={<CreateFood />} />
           </Route>
+          {/* ChatThread has its own custom TopBar + input bar, no BottomNav needed */}
+          <Route path='/messages/:conversationId' element={<ChatThread />} />
         </Route>
       </Routes>
     </Router>

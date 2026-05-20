@@ -22,7 +22,9 @@ function UserLogin() {
             })
 
             console.log(response.data)
-            navigate("/profile")
+            localStorage.setItem('scs_auth', 'true')
+            localStorage.setItem('scs_role', 'user')
+            navigate("/user/profile")
 
         } catch (error) {
             console.log("error in UserLogin in sending data", error)

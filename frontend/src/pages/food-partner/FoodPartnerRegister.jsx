@@ -23,6 +23,8 @@ function FoodPartnerRegister() {
                 withCredentials: true
             } )
 
+            localStorage.setItem('scs_auth', 'true')
+            localStorage.setItem('scs_role', 'food_partner')
             navigate("/create-food")
 
         } catch (error) {

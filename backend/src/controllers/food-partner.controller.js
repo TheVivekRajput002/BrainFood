@@ -6,7 +6,7 @@ async function getFoodPartnerById(req, res) {
     const foodPartnerId = req.params.id;
 
     const foodPartner = await foodPartnerModel.findById(foodPartnerId)
-    const foodItemsByFoodPartner = await foodModel.find({foodPartner: foodPartnerId})
+    const foodItemsByFoodPartner = await foodModel.find({ foodPartner: foodPartnerId })
 
     if (!foodPartner) {
         return res.status(404).json({ message: "food partner not found" })
@@ -22,4 +22,20 @@ async function getFoodPartnerById(req, res) {
 
 }
 
-module.exports = {getFoodPartnerById}
+async function getFoodPartnerProfile() {
+    const foodPartner = req.foodPartner
+
+    res.status(200).json({
+        foodPartner: {
+            _id: foodPartner._id,
+            name: foodPartner.name,
+            email: foodPartner.email,
+            password: foodPartner.password,
+        }
+    })
+}
+
+module.exports = {
+    getFoodPartnerById,
+    getFoodPartnerProfile
+}

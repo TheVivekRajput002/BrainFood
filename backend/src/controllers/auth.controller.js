@@ -5,9 +5,9 @@ const bcrypt = require("bcrypt")
 
 async function registerUser(req, res) {
     try {
-        const { fullName, username, email, password } = req.body
+        const { name, username, email, password } = req.body
 
-        if (!fullName || !username || !email || !password) {
+        if (!name || !username || !email || !password) {
             return res.status(400).json({
                 message: "All fields are required"
             })
@@ -33,7 +33,7 @@ async function registerUser(req, res) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await userModel.create({
-            fullName,
+            name,
             username: normalizedUsername,
             email: normalizedEmail,
             password: hashedPassword
@@ -55,7 +55,7 @@ async function registerUser(req, res) {
             user: {
                 _id: user._id,
                 email: user.email,
-                fullName: user.fullName,
+                name: user.name,
                 username: user.username
             }
         })
@@ -216,24 +216,10 @@ function logoutFoodPartner(req, res) {
     })
 }
 
-function getUserProfile(req, res) {
-    const user = req.user;
-    res.status(200).json({
-        user: {
-            _id: user._id,
-            fullName: user.fullName,
-            username: user.username,
-            email: user.email,
-            createdAt: user.createdAt
-        }
-    })
-}
-
 module.exports = {
     registerUser,
     loginUser,
     logoutUser,
-    getUserProfile,
     registerFoodPartner,
     loginFoodPartner,
     logoutFoodPartner

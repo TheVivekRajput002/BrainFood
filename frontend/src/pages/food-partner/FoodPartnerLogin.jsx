@@ -23,7 +23,9 @@ function FoodPartnerLogin() {
             })
 
             console.log(response.data)
-            navigate("/create-food")
+            localStorage.setItem('scs_auth', 'true')
+            localStorage.setItem('scs_role', 'food_partner')
+            navigate("/")
 
         } catch (error) {
             console.log("err in foodpartnerlogin handlesubmit", error)

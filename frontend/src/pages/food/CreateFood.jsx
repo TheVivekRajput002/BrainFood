@@ -50,12 +50,12 @@ export default function CreateFoodPage() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-6">
+    <div className="min-h-screen flex justify-center items-center bg-[var(--color-bg)] px-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-zinc-800 p-8 rounded-xl shadow-md w-[400px]"
+        className="bg-[var(--color-surface)] border border-[var(--color-border)] p-8 rounded-xl shadow-md w-[400px]"
       >
-        <h1 className="text-2xl font-semibold mb-6">
+        <h1 className="text-2xl font-semibold mb-6 text-[var(--color-text-primary)]">
           Create Food Item
         </h1>
 
@@ -64,7 +64,7 @@ export default function CreateFoodPage() {
           placeholder="Food Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full border p-2 mb-4 rounded"
+          className="w-full border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text-primary)] p-2 mb-4 rounded outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
           required
         />
 
@@ -72,7 +72,7 @@ export default function CreateFoodPage() {
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full border p-2 mb-4 rounded"
+          className="w-full border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text-primary)] p-2 mb-4 rounded outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
           required
         />
 
@@ -80,20 +80,20 @@ export default function CreateFoodPage() {
           type="file"
           accept="video/*"
           onChange={(e) => setVideo(e.target.files[0])}
-          className="mb-4"
+          className="mb-4 text-[var(--color-text-secondary)]"
           required
         />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-black text-white py-2 rounded"
+          className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-text-on-primary)] py-2 rounded transition-colors"
         >
           {loading ? "Uploading..." : "Create Food"}
         </button>
 
         {message && (
-          <p className="mt-4 text-center text-sm">{message}</p>
+          <p className="mt-4 text-center text-sm text-[var(--color-text-secondary)]">{message}</p>
         )}
       </form>
     </div>

@@ -11,7 +11,7 @@ export default function FoodPartnerProfile() {
     const [videos, setVideos] = useState([])
 
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URL}/api/food-partner/${id}`, { withCredentials: true })
+        axios.get(`${import.meta.env.VITE_API_URL}/api/food-partner/profile`, { withCredentials: true })
             .then(response => {
                 console.log(response.data.foodPartner)
                 setProfile(response.data.foodPartner)
@@ -58,24 +58,24 @@ export default function FoodPartnerProfile() {
     };
 
     if (!profile || !videos) {
-        return <h1>Loading profile...</h1>;
+        return <h1 className="text-[var(--color-text-secondary)] p-6">Loading profile...</h1>;
     }
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 to-gray-50 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[var(--color-bg)] py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 {/* Profile Header Card */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 mb-8 overflow-hidden">
+                <div className="bg-[var(--color-surface)] rounded-xl shadow-md hover:shadow-lg transition-shadow border border-[var(--color-border)] mb-8 overflow-hidden">
                     {/* Card Header */}
-                    <div className="flex flex-col md:flex-row gap-8 p-8 md:p-10 border-b border-gray-200 dark:border-gray-700 items-start md:items-start flex-wrap">
+                    <div className="flex flex-col md:flex-row gap-8 p-8 md:p-10 border-b border-[var(--color-border)] items-start md:items-start flex-wrap">
                         {/* Avatar Section */}
                         <div className="flex-shrink-0">
-                            <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-orange-500 to-orange-400 flex items-center justify-center overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg hover:scale-105 transition-transform">
+                            <div className="relative w-32 h-32 rounded-full bg-[var(--gradient-brand)] flex items-center justify-center overflow-hidden border-4 border-[var(--color-surface)] shadow-lg hover:scale-105 transition-transform">
                                 {profile.avatar ? (
                                     <img src={profile.avatar} alt="Business" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="text-white text-5xl flex items-center justify-center">
+                                    <div className="text-[var(--color-text-on-primary)] text-5xl flex items-center justify-center">
                                         <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                             <circle cx="12" cy="7" r="4"></circle>
@@ -83,8 +83,8 @@ export default function FoodPartnerProfile() {
                                     </div>
                                 )}
                                 {isEditing && (
-                                    <label className="absolute inset-0 bg-black/50 flex items-center justify-center cursor-pointer opacity-0 hover:opacity-100 transition-opacity rounded-full">
-                                        <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <label className="absolute inset-0 bg-[color:var(--color-backdrop)] flex items-center justify-center cursor-pointer opacity-0 hover:opacity-100 transition-opacity rounded-full">
+                                        <svg className="w-6 h-6 text-[var(--color-text-on-primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <path d="M12 5v14M5 12h14"></path>
                                         </svg>
                                         <input
@@ -108,7 +108,7 @@ export default function FoodPartnerProfile() {
                                         value={profile.name || ''}
                                         onChange={handleInputChange}
                                         placeholder="Business Name"
-                                        className="px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg font-sans text-base transition-all focus:outline-none focus:border-orange-500 focus:ring-3 focus:ring-orange-200 dark:focus:ring-orange-900 dark:bg-gray-700 dark:text-white"
+                                        className="px-4 py-3 border-2 border-[var(--color-input-border)] rounded-lg bg-[var(--color-input-bg)] text-[var(--color-text-primary)] font-sans text-base transition-all focus:outline-none focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-focus-ring)]"
                                     />
                                     <input
                                         type="text"
@@ -116,15 +116,15 @@ export default function FoodPartnerProfile() {
                                         value={profile.address || ''}
                                         onChange={handleInputChange}
                                         placeholder="Address"
-                                        className="px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg font-sans text-base transition-all focus:outline-none focus:border-orange-500 focus:ring-3 focus:ring-orange-200 dark:focus:ring-orange-900 dark:bg-gray-700 dark:text-white"
+                                        className="px-4 py-3 border-2 border-[var(--color-input-border)] rounded-lg bg-[var(--color-input-bg)] text-[var(--color-text-primary)] font-sans text-base transition-all focus:outline-none focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-focus-ring)]"
                                     />
                                 </div>
                             ) : (
                                 <div>
 
                                     <div className="flex flex-col gap-2">
-                                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{profile.name}</h2>
-                                        <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-1">
+                                        <h2 className="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">{profile.name}</h2>
+                                        <p className="text-[var(--color-text-secondary)] text-sm flex items-center gap-1">
                                             <span>📍</span>
                                             {profile?.address || "Nil"}
                                         </p>
@@ -135,39 +135,39 @@ export default function FoodPartnerProfile() {
                     </div>
 
                     {/* Stats Section */}
-                    <div className="flex items-center justify-center gap-12 md:gap-24 py-8 px-8 bg-gradient-to-r from-orange-50 to-white dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-center gap-12 md:gap-24 py-8 px-8 bg-[var(--color-surface-2)] border-b border-[var(--color-border)]">
                         <div className="text-center">
-                            <div className="text-3xl font-black bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-1 tracking-tight">
+                            <div className="text-3xl font-black text-[var(--color-primary)] mb-1 tracking-tight">
                                 {profile?.totalMeals}
                             </div>
-                            <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                            <div className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
                                 Total Meals
                             </div>
                         </div>
-                        <div className="hidden md:block w-px h-16 bg-gray-200 dark:bg-gray-600"></div>
+                        <div className="hidden md:block w-px h-16 bg-[var(--color-border)]"></div>
                         <div className="text-center">
-                            <div className="text-3xl font-black bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-1 tracking-tight">
+                            <div className="text-3xl font-black text-[var(--color-primary)] mb-1 tracking-tight">
                                 {(profile?.customerServed / 1000).toFixed(0)}K
                             </div>
-                            <div className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                            <div className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
                                 Customers Served
                             </div>
                         </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex flex-col sm:flex-row gap-3 p-6 border-t border-[var(--color-border)]">
                         {isEditing ? (
                             <>
                                 <button
                                     onClick={handleSave}
-                                    className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg transition-all duration-150 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg active:translate-y-0 tracking-tight"
+                                    className="flex-1 px-6 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-text-on-primary)] font-semibold rounded-lg transition-all duration-150 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg active:translate-y-0 tracking-tight"
                                 >
                                     Save Changes
                                 </button>
                                 <button
                                     onClick={handleCancel}
-                                    className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg transition-all border border-gray-300 dark:border-gray-600"
+                                    className="flex-1 px-6 py-3 bg-[var(--color-surface-2)] hover:bg-[var(--color-hover)] text-[var(--color-text-primary)] font-semibold rounded-lg transition-all border border-[var(--color-border)]"
                                 >
                                     Cancel
                                 </button>
@@ -175,7 +175,7 @@ export default function FoodPartnerProfile() {
                         ) : (
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg transition-all duration-150 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg active:translate-y-0 tracking-tight"
+                                className="w-full px-6 py-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-text-on-primary)] font-semibold rounded-lg transition-all duration-150 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg active:translate-y-0 tracking-tight"
                             >
                                 Edit Profile
                             </button>
@@ -184,18 +184,10 @@ export default function FoodPartnerProfile() {
                 </div>
 
                 {/* Videos Grid Section */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-8 md:p-10">
+                <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-[var(--color-border)] p-8 md:p-10">
                     {/* Section Header */}
                     <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Recent Videos</h3>
-                        {/* <button
-                            title="Add video"
-                            className="w-10 h-10 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-all flex items-center justify-center cursor-pointer active:scale-95"
-                        >
-                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M12 5v14M5 12h14"></path>
-                            </svg>
-                        </button> */}
+                        <h3 className="text-xl font-bold text-[var(--color-text-primary)] tracking-tight">Recent Videos</h3>
                     </div>
 
                     {/* Videos Grid */}
@@ -203,7 +195,7 @@ export default function FoodPartnerProfile() {
                         {videos.map(v => (
                             <div
                                 key={v.id}
-                                className="group relative rounded-sm overflow-hidden  border-gray-200 dark:border-gray-600 cursor-pointer transition-all duration-300 hover:-translate-y-1 bg-zinc-500"
+                                className="group relative rounded-sm overflow-hidden border border-[var(--color-border)] cursor-pointer transition-all duration-300 hover:-translate-y-1 bg-[var(--color-surface-2)]"
                             >
                                 {/* Video Placeholder */}
                                 <video src={v.video} muted></video>

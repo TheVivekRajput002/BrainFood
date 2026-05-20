@@ -14,10 +14,10 @@ export default function Button({
     
     // Variant styles mapping exactly to CSS Custom Properties per PRD
     const variantClasses = {
-        primary: 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white focus:ring-[var(--color-primary)]',
-        secondary: 'bg-[var(--color-secondary)] hover:bg-[#204d39] text-white focus:ring-[var(--color-secondary)]',
+        primary: 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-text-on-primary)] focus:ring-[var(--color-primary)]',
+        secondary: 'bg-[var(--color-secondary)] hover:brightness-110 text-[var(--color-text-on-primary)] focus:ring-[var(--color-secondary)]',
         ghost: 'bg-transparent hover:bg-[var(--color-surface-2)] text-[var(--color-text-primary)] border border-[var(--color-border)] focus:ring-[var(--color-border)]',
-        danger: 'bg-[var(--color-danger)] hover:bg-red-600 text-white focus:ring-[var(--color-danger)]',
+        danger: 'bg-[var(--color-danger)] hover:brightness-110 text-[var(--color-text-on-primary)] focus:ring-[var(--color-danger)]',
     };
 
     // Size utility classes

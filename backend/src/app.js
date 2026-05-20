@@ -2,6 +2,7 @@ const express = require("express")
 const cookieParser = require("cookie-parser")
 require('dotenv').config();
 const authRoutes = require("./routes/auth.route")
+const userRoutes = require("./routes/user.route")
 const foodRoutes = require("./routes/food.route")
 const foodPartnerRoutes = require("./routes/food-partner.route")
 const cors = require("cors")
@@ -46,6 +47,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authLimiter)
 app.use("/api/auth", authRoutes)
+app.use("/api/user", userRoutes)
 app.use("/api/food", foodRoutes)
 app.use("/api/food-partner", foodPartnerRoutes)
 

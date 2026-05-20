@@ -1,72 +1,157 @@
-# FoodReel (SCS FoodPlatform)
+# SCS FoodPlatform
 
-FoodReel is a social discovery platform for food enthusiasts, featuring a short-form video feed to explore culinary content from local food partners. Users can interact by liking and saving posts, managing personal profiles, and connecting via real-time messaging.
+Short-form food discovery platform with role-based auth, food reel uploads, social actions (like/save), and a mobile-first React interface.
 
-## Features
+## Summary
+SCS FoodPlatform is a full-stack app for two user roles:
+- `User`: browse reels, like/bookmark content, view profiles.
+- `Food Partner`: register/login and publish food reels.
 
-- **Frontend**: Built with [React 19](https://react.dev/), [Vite](https://vitejs.dev/), and [Tailwind CSS v4](https://tailwindcss.com/) for a fast, modern, and responsive user interface.
-- **Backend**: Powered by [Node.js](https://nodejs.org/) and [Express.js v5](https://expressjs.com/), providing a robust REST API.
-- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/) for data modeling.
-- **Authentication**: Secure user authentication using [JSON Web Tokens (JWT)](https://jwt.io/) and [bcrypt](https://www.npmjs.com/package/bcrypt) for password hashing.
-- **File Uploads**: Handles file uploads with [Multer](https://github.com/expressjs/multer) and [ImageKit](https://imagekit.io/) integration for media management.
+The project is split into:
+- `frontend/`: React + Vite + Tailwind client.
+- `backend/`: Express + MongoDB API with JWT cookie auth.
+
+## What Problem It Solves
+This project provides a focused social food product where creators (food partners) can post short food content and users can discover and engage with it without a complex marketplace flow.
+
+## Quick Demo Flow
+1. Register/login as a `food partner`.
+2. Create a food reel from `/create-food` (video upload).
+3. Login as a `user`.
+4. Open `/` feed, then like and bookmark reels.
+5. Visit `/food-partner/:id` and `/profile`.
+
+## Tech Stack
+- Frontend: React 19, React Router, Vite, Tailwind CSS v4, Axios
+- Backend: Node.js, Express 5, Mongoose, JWT, bcrypt, multer, ImageKit
+- Security/middleware: Helmet, CORS allowlist, rate limiting, cookie-parser
 
 ## Project Structure
+```txt
+SCS FoodPlatform/
+  backend/
+    src/
+    server.js
+    .env.example
+  frontend/
+    src/
+    index.html
+```
 
-- `/frontend` - Contains the React application (Vite template).
-- `/backend` - Contains the Node.js/Express server API.
+## Installation
+### Prerequisites
+- Node.js 18+
+- npm 9+
+- MongoDB (local or Atlas)
+- ImageKit account (for video upload)
 
-## Prerequisites
+### 1) Clone and install
+```bash
+git clone <your-repo-url>
+cd "SCS FoodPlatform"
 
-- Node.js installed
-- MongoDB instance (local or Atlas)
+cd backend
+npm install
 
-## Getting Started
+cd ../frontend
+npm install
+```
 
-### Backend Setup
+## Configuration
+### Backend env (`backend/.env`)
+Start from `backend/.env.example` and set:
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
+```env
+JWT_SECRET=your_jwt_secret
+MONGODB_URI=your_mongodb_connection_string
+IMAGEKIT_PUBLIC_KEY=your_imagekit_public_key
+IMAGEKIT_PRIVATE_KEY=your_imagekit_private_key
+IMAGEKIT_URL_ENDPOINT=your_imagekit_url_endpoint
+PORT=3000
+ALLOWED_ORIGINS=http://localhost:5173
+```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+Notes:
+- `ALLOWED_ORIGINS` supports comma-separated origins.
+- Auth cookies are set with `secure: true` and `sameSite: none`, so HTTPS is required in strict browser environments.
 
-3. Configure environment variables:
-   Create a `.env` file in the `backend` directory and add the necessary variables mapping to your config (e.g., `PORT`, `MONGO_URI`, `JWT_SECRET`, ImageKit credentials).
+### Frontend env (`frontend/.env`)
+```env
+VITE_API_URL=http://localhost:3000
+```
 
-4. Start the development server:
-   ```bash
-   npm run dev
-   # or
-   npx nodemon server.js
-   ```
+## Run Locally
+### Start backend
+```bash
+cd backend
+node server.js
+```
 
-### Frontend Setup
+### Start frontend
+```bash
+cd frontend
+npm run dev
+```
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
+Frontend default URL is shown by Vite (usually `http://localhost:5173`).
 
 ## Scripts
+### Frontend (`frontend/package.json`)
+- `npm run dev` - Start Vite dev server
+- `npm run build` - Production build
+- `npm run preview` - Preview built app
+- `npm run lint` - Run ESLint
 
-- **Frontend**:
-  - `npm run dev`: Starts the Vite development server.
-  - `npm run build`: Builds the app for production.
-  - `npm run lint`: Runs ESLint for code formatting/linting.
-  
-- **Backend**:
-  - `nodemon server.js`: Runs the backend in watch mode (requires nodemon).
+### Backend (`backend/package.json`)
+- `npm test` - Placeholder script (currently not implemented)
+
+## API Overview
+Base URL: `http://localhost:3000`
+
+### Auth (`/api/auth`)
+- `POST /user/register`
+- `POST /user/login`
+- `GET /user/logout`
+- `GET /user/profile` (auth required)
+- `POST /food-partner/register`
+- `POST /food-partner/login`
+- `GET /food-partner/logout`
+
+### Food (`/api/food`)
+- `POST /` (food-partner auth + `video` file upload)
+- `GET /` (user auth)
+- `POST /like` (user auth, `{ foodId }`)
+- `POST /bookmark` (user auth, `{ foodId }`)
+
+### Food Partner (`/api/food-partner`)
+- `GET /:id` (user auth)
+
+## Frontend Routes
+Public:
+- `/user/register`
+- `/user/login`
+- `/food-partner/register`
+- `/food-partner/login`
+
+Protected:
+- `/`
+- `/search`
+- `/saved`
+- `/messages`
+- `/messages/:conversationId`
+- `/food-partner/:id`
+- `/profile`
+- `/create-food`
+
+## Caveats and Limitations
+- Essential messaging screens currently use mock data in `frontend/src/mock/messages.json`.
+- Backend has no production-ready test suite yet.
+- Cookies configured for cross-site secure mode may require HTTPS/local proxy adjustments during development.
+
+## Contributing
+1. Create a feature branch.
+2. Keep changes scoped and documented.
+3. Run frontend lint before PR.
+
+## License
+Current backend `package.json` specifies `ISC` license. If you want a different license for the full monorepo, update this section and add a root `LICENSE` file.

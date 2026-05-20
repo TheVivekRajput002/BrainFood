@@ -43,12 +43,12 @@ function Saved() {
     }
 
     return (
-        <div className="h-[100dvh] w-full bg-black flex flex-col">
+        <div className="h-[100dvh] w-full bg-[var(--color-bg)] flex flex-col">
 
             {/* ── Header ──────────────────────────────────────── */}
             <header className="px-5 pt-12 pb-4 shrink-0">
-                <h1 className="text-white text-2xl font-bold tracking-tight">Saved</h1>
-                <p className="text-white/50 text-sm mt-1">{savedItems.length} items saved</p>
+                <h1 className="text-[var(--color-text-primary)] text-2xl font-bold tracking-tight">Saved</h1>
+                <p className="text-[var(--color-text-secondary)] text-sm mt-1">{savedItems.length} items saved</p>
             </header>
 
             {/* ── Saved Items Grid ─────────────────────────────── */}
@@ -56,14 +56,14 @@ function Saved() {
                 {savedItems.length === 0 ? (
                     /* Empty state */
                     <div className="flex flex-col items-center justify-center h-full gap-4 text-center px-6">
-                        <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <div className="w-20 h-20 rounded-full bg-[var(--color-surface-2)] flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-[var(--color-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
                             </svg>
                         </div>
-                        <p className="text-white/40 text-base font-medium">No saved items yet</p>
-                        <p className="text-white/25 text-sm">Save your favorite food reels to find them here</p>
-                        <Link to="/" className="mt-2 bg-white/10 hover:bg-white/15 text-white text-sm font-medium py-2.5 px-6 rounded-full border border-white/10 transition-all">
+                        <p className="text-[var(--color-text-secondary)] text-base font-medium">No saved items yet</p>
+                        <p className="text-[var(--color-text-muted)] text-sm">Save your favorite food reels to find them here</p>
+                        <Link to="/" className="mt-2 bg-[var(--color-surface)] hover:bg-[var(--color-hover)] text-[var(--color-text-primary)] text-sm font-medium py-2.5 px-6 rounded-full border border-[var(--color-border)] transition-all">
                             Browse Reels
                         </Link>
                     </div>
@@ -72,7 +72,7 @@ function Saved() {
                         {savedItems.map(item => (
                             <div
                                 key={item._id}
-                                className="relative group rounded-2xl overflow-hidden border border-white/10 bg-white/5 aspect-[3/4]"
+                                className="relative group rounded-2xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-surface)] aspect-[3/4]"
                             >
                                 {/* Thumbnail */}
                                 <img
@@ -82,32 +82,32 @@ function Saved() {
                                 />
 
                                 {/* Gradient overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                <div className="absolute inset-0 bg-[var(--gradient-reel-overlay)]"></div>
 
                                 {/* Remove button (top right) */}
                                 <button
                                     onClick={() => removeSaved(item._id)}
-                                    className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60"
+                                    className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[color:var(--color-backdrop)] backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[color:var(--color-scrim)]"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-[var(--color-text-on-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
 
                                 {/* Saved bookmark icon (top left) */}
-                                <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                                <div className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[color:var(--color-backdrop)] backdrop-blur-sm flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-[var(--color-save)]" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
                                     </svg>
                                 </div>
 
                                 {/* Bottom info */}
                                 <div className="absolute bottom-0 left-0 right-0 p-3">
-                                    <h3 className="text-white text-sm font-semibold truncate">{item.name}</h3>
-                                    <p className="text-white/50 text-[11px] mt-0.5 truncate">{item.storeName}</p>
+                                    <h3 className="text-[var(--color-text-on-primary)] text-sm font-semibold truncate">{item.name}</h3>
+                                    <p className="text-[var(--color-text-on-primary)]/70 text-[11px] mt-0.5 truncate">{item.storeName}</p>
 
                                     <Link to={`/food-partner/${item.foodPartner}`}>
-                                        <button className="mt-2 w-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white text-[11px] font-medium py-1.5 rounded-lg border border-white/15 transition-all active:scale-95">
+                                        <button className="mt-2 w-full bg-[color:var(--color-backdrop)] hover:bg-[color:var(--color-scrim)] backdrop-blur-sm text-[var(--color-text-on-primary)] text-[11px] font-medium py-1.5 rounded-lg border border-[color:var(--color-divider)] transition-all active:scale-95">
                                             visit store
                                         </button>
                                     </Link>

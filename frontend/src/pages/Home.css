@@ -70,13 +70,13 @@
 /* CTA button variant */
 .home-navbar__link--cta {
     background-color: var(--color-primary);
-    color: #ffffff !important;
+    color: var(--color-text-on-primary) !important;
     font-weight: 600;
 }
 
 .home-navbar__link--cta:hover {
     background-color: var(--color-primary-hover);
-    color: #ffffff !important;
+    color: var(--color-text-on-primary) !important;
 }
 
 /* ── Main / Hero ─────────────────────────────────────────────── */
@@ -137,7 +137,7 @@
 
 .home-hero__btn--primary {
     background-color: var(--color-primary);
-    color: #ffffff;
+    color: var(--color-text-on-primary);
 }
 
 .home-hero__btn--primary:hover {

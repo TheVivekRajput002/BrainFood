@@ -1,9 +1,11 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-function BottomNav() {
+function BottomNav({ canCreate, onCreateClick }) {
     const location = useLocation()
     const currentPath = location.pathname
+    const role = localStorage.getItem('scs_role')
+    const profilePath = role === 'food_partner' ? '/food-partner/profile' : '/user/profile'
 
     const tabs = [
         {
@@ -24,6 +26,17 @@ function BottomNav() {
                 </svg>
             ),
         },
+        ...(canCreate
+            ? [{
+                name: 'create',
+                isCreateAction: true,
+                icon: () => (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 5.5v13m6.5-6.5h-13" />
+                    </svg>
+                ),
+            }]
+            : []),
         {
             name: 'saved',
             path: '/saved',
@@ -43,15 +56,15 @@ function BottomNav() {
                     </svg>
                     {/* PRD mentioned notification badge for unread count, let's add a static one for now as per design */}
                     <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-black"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-error)] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--color-error)] border-2 border-[var(--color-bg)]"></span>
                     </span>
                 </div>
             ),
         },
         {
             name: 'profile',
-            path: '/profile',
+            path: profilePath,
             icon: (active) => (
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill={active ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -61,14 +74,28 @@ function BottomNav() {
     ]
 
     return (
-        <nav className="w-full bg-black/90 backdrop-blur-md border-t border-white/10 px-6 py-2 flex items-center justify-around z-50 shrink-0">
+        <nav className="w-full bg-[var(--color-navbar-bg)] backdrop-blur-md border-t border-[var(--color-navbar-border)] px-6 py-2 flex items-center justify-around z-50 shrink-0">
             {tabs.map(tab => {
+                if (tab.isCreateAction) {
+                    return (
+                        <button
+                            key={tab.name}
+                            type="button"
+                            onClick={onCreateClick}
+                            className="flex flex-col items-center gap-1 transition-colors text-[var(--color-tab-inactive)] hover:text-[var(--color-text-secondary)]"
+                        >
+                            {tab.icon(false)}
+                            <span className="text-[10px] font-medium">{tab.name}</span>
+                        </button>
+                    )
+                }
+
                 const isActive = currentPath === tab.path
                 return (
                     <Link
                         key={tab.name}
                         to={tab.path}
-                        className={`flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-white' : 'text-white/50 hover:text-white/70'}`}
+                        className={`flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-tab-inactive)] hover:text-[var(--color-text-secondary)]'}`}
                     >
                         {tab.icon(isActive)}
                         <span className="text-[10px] font-medium">{tab.name}</span>

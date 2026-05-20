@@ -37,7 +37,7 @@ export default function ConversationRow({
             </div>
 
             {unreadCount > 0 && (
-                <div className="w-5 h-5 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                <div className="w-5 h-5 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-[var(--color-text-on-primary)] text-[10px] font-bold shrink-0">
                     {unreadCount}
                 </div>
             )}

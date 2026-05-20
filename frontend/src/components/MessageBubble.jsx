@@ -11,7 +11,7 @@ export default function MessageBubble({
             <div 
                 className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
                     isOwn 
-                    ? 'bg-[var(--color-primary)] text-white rounded-tr-sm' 
+                    ? 'bg-[var(--color-primary)] text-[var(--color-text-on-primary)] rounded-tr-sm' 
                     : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border)] rounded-tl-sm'
                 }`}
             >
