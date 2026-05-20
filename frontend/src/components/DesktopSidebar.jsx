@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 export default function DesktopSidebar({ canCreate, onCreateClick, themeMode, onToggleTheme }) {
     const { pathname } = useLocation();
     const role = localStorage.getItem('scs_role');
-    const profilePath = role === 'food_partner' ? '/food-partner/profile' : '/user/profile';
+    const profilePath = role === 'creator' ? '/creator/profile' : '/user/profile';
 
     const tabs = [
         {

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const foodPartnerSchema = new mongoose.Schema({
+const creatorSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -18,6 +18,6 @@ const foodPartnerSchema = new mongoose.Schema({
     { timestamps: true }
 )
 
-const foodPartnerModel = mongoose.model("foodpartner", foodPartnerSchema);
+const creatorModel = mongoose.model("Creator", creatorSchema);
 
-module.exports = foodPartnerModel;
+module.exports = creatorModel;

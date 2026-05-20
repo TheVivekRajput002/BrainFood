@@ -10,17 +10,18 @@ export default function Layout() {
         if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     });
-    const isFoodPartner = localStorage.getItem('scs_role') === 'food_partner';
+    const isCreator = localStorage.getItem('scs_role') === 'creator';
 
     React.useEffect(() => {
         document.documentElement.style.colorScheme = themeMode;
+        document.documentElement.setAttribute('data-theme', themeMode);
         localStorage.setItem('themeMode', themeMode);
     }, [themeMode]);
 
     return (
         <div className="min-h-screen bg-[var(--color-bg)]">
             <DesktopSidebar
-                canCreate={isFoodPartner}
+                canCreate={isCreator}
                 onCreateClick={() => navigate('/create-reel')}
                 themeMode={themeMode}
                 onToggleTheme={() => setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'))}
@@ -34,7 +35,7 @@ export default function Layout() {
             </main>
             
             <div className="fixed bottom-0 left-0 w-full z-50 md:hidden">
-                <BottomNav canCreate={isFoodPartner} onCreateClick={() => navigate('/create-reel')} />
+                <BottomNav canCreate={isCreator} onCreateClick={() => navigate('/create-reel')} />
             </div>
         </div>
     );

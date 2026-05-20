@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 
 
-function FoodPartnerLogin() {
+function creatorLogin() {
 
     const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ function FoodPartnerLogin() {
 
         try {
 
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/food-partner/login`, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/creator/login`, {
                 email,
                 password
             }, {
@@ -24,11 +24,11 @@ function FoodPartnerLogin() {
 
             console.log(response.data)
             localStorage.setItem('scs_auth', 'true')
-            localStorage.setItem('scs_role', 'food_partner')
+            localStorage.setItem('scs_role', 'creator')
             navigate("/")
 
         } catch (error) {
-            console.log("err in foodpartnerlogin handlesubmit", error)
+            console.log("err in creatorlogin handlesubmit", error)
         }
 
     }
@@ -45,7 +45,7 @@ function FoodPartnerLogin() {
 
                     {/* Badge */}
                     <div className="mb-4">
-                        <span className="auth-badge">Food Partner</span>
+                        <span className="auth-badge">Creator</span>
                     </div>
 
                     {/* Heading */}
@@ -84,7 +84,7 @@ function FoodPartnerLogin() {
                     {/* Footer */}
                     <p className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                         Not a partner yet?{' '}
-                        <Link to="/food-partner/register" className="auth-link">Apply now</Link>
+                        <Link to="/creator/register" className="auth-link">Apply now</Link>
                     </p>
 
                     <div className="auth-divider mt-6 mb-5 text-xs">or</div>
@@ -100,4 +100,4 @@ function FoodPartnerLogin() {
     )
 }
 
-export default FoodPartnerLogin
+export default creatorLogin

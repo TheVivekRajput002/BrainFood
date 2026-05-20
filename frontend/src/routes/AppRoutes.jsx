@@ -7,9 +7,9 @@ import UserProfile from '../pages/user/UserProfile';
 import UserRegister from '../pages/user/UserRegister';
 import UserLogin from '../pages/user/UserLogin';
 import EditUserProfile from '../pages/user/EditUserProfile';
-import FoodPartnerRegister from '../pages/food-partner/FoodPartnerRegister';
-import FoodPartnerLogin from '../pages/food-partner/FoodPartnerLogin';
-import FoodPartnerProfile from '../pages/food-partner/FoodPartnerProfile';
+import CreatorRegister from '../pages/creator/CreatorRegister';
+import CreatorLogin from '../pages/creator/CreatorLogin';
+import CreatorProfile from '../pages/creator/CreatorProfile';
 import CreateReel from '../pages/reel/CreateReel';
 import Inbox from '../pages/Messaging/Inbox';
 import ChatThread from '../pages/Messaging/ChatThread';
@@ -25,8 +25,8 @@ function AppRoutes() {
         {/* Public Auth Routes without Navigation Layout */}
         <Route path='/user/register' element={<UserRegister />} />
         <Route path='/user/login' element={<UserLogin />} />
-        <Route path='/food-partner/register' element={<FoodPartnerRegister />} />
-        <Route path='/food-partner/login' element={<FoodPartnerLogin />} />
+        <Route path='/creator/register' element={<CreatorRegister />} />
+        <Route path='/creator/login' element={<CreatorLogin />} />
 
         {/* Protected Routes requiring Authentication */}
         <Route element={<ProtectedRoute />}>
@@ -35,10 +35,10 @@ function AppRoutes() {
             <Route path='/search' element={<Search />} />
             <Route path='/saved' element={<Saved />} />
             <Route path='/messages' element={<Inbox />} />
-            <Route path='/food-partner/:id' element={<FoodPartnerProfile />} />
+            <Route path='/creator/:id' element={<CreatorProfile />} />
             <Route path='/user/profile' element={<UserProfile />} />
             <Route path='/user/profile/edit' element={<EditUserProfile />} />
-            <Route path='/food-partner/profile' element={<FoodPartnerProfile />} />
+            <Route path='/creator/profile' element={<CreatorProfile />} />
             <Route path='/create-reel' element={<CreateReel />} />
           </Route>
           {/* ChatThread has its own custom TopBar + input bar, no BottomNav needed */}

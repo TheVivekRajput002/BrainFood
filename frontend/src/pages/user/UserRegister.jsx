@@ -80,7 +80,7 @@ function UserRegister() {
                 </Link>
 
                 <p className="mt-4 text-[0.88rem] text-[var(--color-text-muted)]">
-                    Are you a restaurant? <Link to="/food-partner/register" className="text-[var(--color-info)] font-semibold no-underline hover:underline">Register as Food Partner</Link>
+                    Are you a restaurant? <Link to="/creator/register" className="text-[var(--color-info)] font-semibold no-underline hover:underline">Register as Creator</Link>
                 </p>
             </div>
             <div className="mt-8 flex flex-wrap justify-center gap-3.5 text-[0.83rem] text-[var(--color-text-muted)]">

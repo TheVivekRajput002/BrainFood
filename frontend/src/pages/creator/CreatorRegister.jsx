@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 
-function FoodPartnerRegister() {
+function CreatorRegister() {
 
     const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ function FoodPartnerRegister() {
 
         try {
             
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/food-partner/register`,{
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/creator/register`,{
                 name,
                 email,
                 password
@@ -24,7 +24,7 @@ function FoodPartnerRegister() {
             } )
 
             localStorage.setItem('scs_auth', 'true')
-            localStorage.setItem('scs_role', 'food_partner')
+            localStorage.setItem('scs_role', 'creator')
             navigate("/create-reel")
 
         } catch (error) {
@@ -46,7 +46,7 @@ function FoodPartnerRegister() {
 
                     {/* Badge */}
                     <div className="mb-4">
-                        <span className="auth-badge">Food Partner</span>
+                        <span className="auth-badge">Creator</span>
                     </div>
 
                     {/* Heading */}
@@ -93,8 +93,8 @@ function FoodPartnerRegister() {
 
                     {/* Footer */}
                     <p className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                        Already have a partner account?{' '}
-                        <Link to="/food-partner/login" className="auth-link">Sign in</Link>
+                        Already have a creator account?{' '}
+                        <Link to="/creator/login" className="auth-link">Sign in</Link>
                     </p>
 
                     <div className="auth-divider mt-6 mb-5 text-xs">or</div>
@@ -110,4 +110,4 @@ function FoodPartnerRegister() {
     )
 }
 
-export default FoodPartnerRegister
+export default CreatorRegister

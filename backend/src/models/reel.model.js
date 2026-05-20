@@ -12,9 +12,9 @@ const reelSchema = new mongoose.Schema({
     description: {
         type: String,
     },
-    foodPartner: {
+    creator: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "foodpartner"
+        ref: "creator"
     },
     likeCount: {
         type: Number,

@@ -378,3 +378,42 @@
     margin-top: 30px;
 }
 
+/* Explicit theme fallback for environments where light-dark() can behave inconsistently */
+:root[data-theme='light'] {
+    --color-bg: hsl(30 20% 98%);
+    --color-surface: hsl(30 18% 97%);
+    --color-input-bg: hsl(30 18% 97%);
+    --color-input-border: hsl(28 20% 84%);
+    --color-text: hsl(20 15% 10%);
+    --color-text-primary: hsl(20 15% 10%);
+    --color-text-secondary: hsl(20 10% 35%);
+    --color-text-muted: hsl(20 8% 55%);
+    --color-text-placeholder: hsl(20 6% 68%);
+    --color-border: hsl(28 20% 88%);
+    --color-divider: hsl(28 15% 91%);
+    --color-hover: hsl(22 60% 96%);
+    --color-navbar-bg: hsl(0 0% 100% / 0.92);
+    --color-navbar-border: hsl(28 20% 90%);
+    --color-sidebar-bg: hsl(30 18% 99%);
+    --color-tab-inactive: hsl(20 10% 55%);
+}
+
+:root[data-theme='dark'] {
+    --color-bg: hsl(20 15% 5%);
+    --color-surface: hsl(20 12% 11%);
+    --color-input-bg: hsl(20 12% 13%);
+    --color-input-border: hsl(20 12% 22%);
+    --color-text: hsl(30 15% 92%);
+    --color-text-primary: hsl(30 15% 92%);
+    --color-text-secondary: hsl(30 10% 72%);
+    --color-text-muted: hsl(30 8% 62%);
+    --color-text-placeholder: hsl(30 6% 50%);
+    --color-border: hsl(20 12% 18%);
+    --color-divider: hsl(20 10% 16%);
+    --color-hover: hsl(22 20% 14%);
+    --color-navbar-bg: hsl(20 12% 8% / 0.92);
+    --color-navbar-border: hsl(20 12% 15%);
+    --color-sidebar-bg: hsl(20 10% 9%);
+    --color-tab-inactive: hsl(30 8% 65%);
+}
+

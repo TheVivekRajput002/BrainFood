@@ -9,7 +9,7 @@ function Saved() {
             name: 'Butter Chicken',
             description: 'Creamy tomato-based curry with tender chicken pieces',
             thumbnail: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&h=500&fit=crop',
-            foodPartner: 'partner1',
+            creator: 'partner1',
             storeName: 'Spice Kitchen',
         },
         {
@@ -17,7 +17,7 @@ function Saved() {
             name: 'Margherita Pizza',
             description: 'Classic Italian pizza with fresh mozzarella and basil',
             thumbnail: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=500&fit=crop',
-            foodPartner: 'partner2',
+            creator: 'partner2',
             storeName: 'Pizza Palace',
         },
         {
@@ -25,7 +25,7 @@ function Saved() {
             name: 'Sushi Platter',
             description: 'Fresh assorted sushi rolls with wasabi and ginger',
             thumbnail: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=500&fit=crop',
-            foodPartner: 'partner3',
+            creator: 'partner3',
             storeName: 'Tokyo Bites',
         },
         {
@@ -33,7 +33,7 @@ function Saved() {
             name: 'Tacos Al Pastor',
             description: 'Authentic Mexican tacos with marinated pork and pineapple',
             thumbnail: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=500&fit=crop',
-            foodPartner: 'partner4',
+            creator: 'partner4',
             storeName: 'El Sabor',
         },
     ])
@@ -106,7 +106,7 @@ function Saved() {
                                     <h3 className="text-[var(--color-text-on-primary)] text-sm font-semibold truncate">{item.name}</h3>
                                     <p className="text-[var(--color-text-on-primary)]/70 text-[11px] mt-0.5 truncate">{item.storeName}</p>
 
-                                    <Link to={`/food-partner/${item.foodPartner}`}>
+                                    <Link to={`/creator/${item.creator}`}>
                                         <button className="mt-2 w-full bg-[color:var(--color-backdrop)] hover:bg-[color:var(--color-scrim)] backdrop-blur-sm text-[var(--color-text-on-primary)] text-[11px] font-medium py-1.5 rounded-lg border border-[color:var(--color-divider)] transition-all active:scale-95">
                                             visit store
                                         </button>

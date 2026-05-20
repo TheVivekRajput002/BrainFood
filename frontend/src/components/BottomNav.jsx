@@ -5,7 +5,7 @@ function BottomNav({ canCreate, onCreateClick }) {
     const location = useLocation()
     const currentPath = location.pathname
     const role = localStorage.getItem('scs_role')
-    const profilePath = role === 'food_partner' ? '/food-partner/profile' : '/user/profile'
+    const profilePath = role === 'creator' ? '/creator/profile' : '/user/profile'
 
     const tabs = [
         {

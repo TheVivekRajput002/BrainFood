@@ -32,65 +32,76 @@ function UserLogin() {
     }
 
     return (
-        <div
-            className="min-h-dvh flex items-center justify-center p-6"
-            style={{ backgroundColor: 'var(--color-bg)' }}
-        >
-            <div className="w-full max-w-sm">
-
-                {/* Card */}
-                <div className="auth-card p-8">
-
-                    {/* Badge */}
-                    <div className="mb-4">
-                        <span className="auth-badge">User</span>
+        <div className="min-h-dvh bg-[var(--color-bg)] px-5 py-10 flex items-center justify-center">
+            <div className="w-full max-w-md">
+                <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-7 shadow-[var(--shadow-lg)]">
+                    <div className="inline-flex items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
+                        User Login
                     </div>
 
-                    {/* Heading */}
-                    <h1
-                        className="text-2xl font-semibold tracking-tight mb-1"
-                        style={{ color: 'var(--color-text-primary)' }}
-                    >
+                    <h1 className="mt-4 text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">
                         Welcome back
                     </h1>
-                    <p className="text-sm mb-7" style={{ color: 'var(--color-text-secondary)' }}>
+                    <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
                         Sign in to your account to continue.
                     </p>
 
-                    {/* Form */}
-                    <form className="flex flex-col gap-5" noValidate onSubmit={handleSubmit}>
-
-                        {/* Email */}
+                    <form className="mt-7 space-y-4" noValidate onSubmit={handleSubmit}>
                         <div>
-                            <label htmlFor="email" className="auth-label">Email address</label>
-                            <input id="email" type="email" placeholder="you@example.com" className="auth-input" autoComplete="email" />
+                            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[var(--color-text-secondary)]">
+                                Email address
+                            </label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                placeholder="you@example.com"
+                                autoComplete="email"
+                                className="h-12 w-full rounded-xl border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-4 text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none transition focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+                            />
                         </div>
 
-                        {/* Password */}
                         <div>
-                            <div className="flex items-center justify-between mb-1.5">
-                                <label htmlFor="password" className="auth-label" style={{ marginBottom: 0 }}>Password</label>
-
-                            </div>
-                            <input id="password" type="password" placeholder="Enter your password" className="auth-input" autoComplete="current-password" />
+                            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[var(--color-text-secondary)]">
+                                Password
+                            </label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                placeholder="Enter your password"
+                                autoComplete="current-password"
+                                className="h-12 w-full rounded-xl border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-4 text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none transition focus:border-[var(--color-input-focus)] focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+                            />
                         </div>
 
-                        <button type="submit" className="auth-btn-primary">Sign in</button>
+                        <button
+                            type="submit"
+                            className="mt-2 h-12 w-full rounded-xl bg-[var(--color-primary)] text-sm font-semibold text-[var(--color-text-on-primary)] transition hover:bg-[var(--color-primary-hover)]"
+                        >
+                            Sign in
+                        </button>
                     </form>
 
-                    {/* Footer */}
-                    <p className="mt-6 text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                        Don&apos;t have an account?{' '}
-                        <Link to="/user/register" className="auth-link">Create one</Link>
+                    <p className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
+                        Don&apos;t have an account?{" "}
+                        <Link to="/user/register" className="font-semibold text-[var(--color-info)] hover:underline">
+                            Create one
+                        </Link>
                     </p>
 
-                    <div className="auth-divider mt-6 mb-5 text-xs">or</div>
+                    <div className="my-5 flex items-center gap-3">
+                        <span className="h-px flex-1 bg-[var(--color-border)]" />
+                        <span className="text-xs text-[var(--color-text-muted)]">or</span>
+                        <span className="h-px flex-1 bg-[var(--color-border)]" />
+                    </div>
 
-                    <p className="text-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                        Are you a restaurant?{' '}
-                        <Link to="/food-partner/login" className="auth-link text-xs">Sign in as Food Partner</Link>
+                    <p className="text-center text-xs text-[var(--color-text-muted)]">
+                        Are you a creator?{" "}
+                        <Link to="/creator/login" className="font-semibold text-[var(--color-info)] hover:underline">
+                            Sign in here
+                        </Link>
                     </p>
-
                 </div>
             </div>
         </div>

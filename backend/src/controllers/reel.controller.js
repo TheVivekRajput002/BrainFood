@@ -12,7 +12,7 @@ async function createReel(req, res) {
         name: req.body.name,
         description: req.body.description,
         video: uploadFileResult.url,
-        foodPartner: req.foodPartner._id
+        creator: req.creator._id
     })
 
     res.status(201).json({

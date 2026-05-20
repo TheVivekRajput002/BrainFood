@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from "axios"
 import { useParams } from 'react-router-dom';
 
-export default function FoodPartnerProfile() {
+export default function creatorProfile() {
 
 
     const { id } = useParams()
@@ -11,14 +11,14 @@ export default function FoodPartnerProfile() {
     const [videos, setVideos] = useState([])
 
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URL}/api/food-partner/profile`, { withCredentials: true })
+        axios.get(`${import.meta.env.VITE_API_URL}/api/creator/profile`, { withCredentials: true })
             .then(response => {
-                console.log(response.data.foodPartner)
-                setProfile(response.data.foodPartner)
-                setVideos(response.data.foodPartner.foodItems)
+                console.log(response.data.creator)
+                setProfile(response.data.creator)
+                setVideos(response.data.creator.reel)
             })
             .catch(err => {
-                console.log("here is error in fecthing food partner", err)
+                console.log("here is error in fetching creator", err)
             })
 
     }, [id])

@@ -1,7 +1,7 @@
 const express = require("express")
 const authController = require("../controllers/auth.controller")
 const userController = require("../controllers/user.controller")
-const foodPartnerController = require("../controllers/food-partner.controller")
+const creatorController = require("../controllers/creator.controller")
 const authMiddleware = require("../middleware/auth.middleware")
 
 const router = express.Router();
@@ -11,9 +11,9 @@ router.post("/user/login", authController.loginUser)
 router.get("/user/logout", authController.logoutUser)
 router.get("/user/profile", authMiddleware.authUserMiddleware, userController.getUserProfile)
 
-router.post("/food-partner/register", authController.registerFoodPartner)
-router.post("/food-partner/login", authController.loginFoodPartner)
-router.get("/food-partner/logout", authController.logoutFoodPartner)
-router.get("/food-partner/profile", authMiddleware.authFoodPartnerMiddleware, foodPartnerController.getFoodPartnerProfile)
+router.post("/creator/register", authController.registerCreator)
+router.post("/creator/login", authController.loginCreator)
+router.get("/creator/logout", authController.logoutCreator)
+router.get("/creator/profile", authMiddleware.authCreatorMiddleware, creatorController.getCreatorProfile)
 
 module.exports = router;

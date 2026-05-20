@@ -1,8 +1,8 @@
-const foodPartnerModel = require("../models/foodPartner.model")
+const creatorModel = require("../models/creator.model")
 const userModel = require("../models/user.model")
 const jwt = require("jsonwebtoken")
 
-async function authFoodPartnerMiddleware(req, res, next) {
+async function authCreatorMiddleware(req, res, next) {
     const token = req.cookies.token;
 
     if (!token) {
@@ -13,9 +13,9 @@ async function authFoodPartnerMiddleware(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const foodPartner = await foodPartnerModel.findById(decoded.id);
+        const creator = await creatorModel.findById(decoded.id);
 
-        req.foodPartner = foodPartner
+        req.creator = creator
 
         next()
 
@@ -50,6 +50,6 @@ async function authUserMiddleware(req, res, next) {
 }
 
 module.exports = {
-    authFoodPartnerMiddleware,
+    authCreatorMiddleware,
     authUserMiddleware
 }
