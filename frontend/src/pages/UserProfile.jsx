@@ -9,7 +9,7 @@ function UserProfile() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        axios.get(`${process.env.VITE_API_URL}/api/auth/user/profile`, { withCredentials: true })
+        axios.get(`${import.meta.env.VITE_API_URL}/api/auth/user/profile`, { withCredentials: true })
             .then(response => {
                 setUser(response.data.user)
                 setLoading(false)
