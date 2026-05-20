@@ -21,7 +21,7 @@ export default function Layout() {
         <div className="min-h-screen bg-[var(--color-bg)]">
             <DesktopSidebar
                 canCreate={isFoodPartner}
-                onCreateClick={() => navigate('/create-food')}
+                onCreateClick={() => navigate('/create-reel')}
                 themeMode={themeMode}
                 onToggleTheme={() => setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'))}
             />
@@ -34,7 +34,7 @@ export default function Layout() {
             </main>
             
             <div className="fixed bottom-0 left-0 w-full z-50 md:hidden">
-                <BottomNav canCreate={isFoodPartner} onCreateClick={() => navigate('/create-food')} />
+                <BottomNav canCreate={isFoodPartner} onCreateClick={() => navigate('/create-reel')} />
             </div>
         </div>
     );

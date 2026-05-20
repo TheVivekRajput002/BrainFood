@@ -25,7 +25,7 @@ function FoodPartnerRegister() {
 
             localStorage.setItem('scs_auth', 'true')
             localStorage.setItem('scs_role', 'food_partner')
-            navigate("/create-food")
+            navigate("/create-reel")
 
         } catch (error) {
             console.log("error in handle submit", error)

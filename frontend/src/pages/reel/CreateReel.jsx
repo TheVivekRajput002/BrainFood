@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-export default function CreateFoodPage() {
+export default function CreateReelPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [video, setVideo] = useState(null);
@@ -29,17 +29,17 @@ export default function CreateFoodPage() {
       formData.append("video", video);
 
 
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/food`, formData, { withCredentials: true })
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/reel`, formData, { withCredentials: true })
       console.log(response)
 
-      if (response.ok) {
-        setMessage("Food item created successfully ✅");
+      if (response.status === 201) {
+        setMessage("Reel created successfully");
         setName("");
         setDescription("");
         setVideo(null);
         navigate("/")
       } else {
-        setMessage(response.message || "Failed to create food item");
+        setMessage(response.data?.message || "Failed to create reel");
       }
     } catch (error) {
       console.error(error);
@@ -56,12 +56,12 @@ export default function CreateFoodPage() {
         className="bg-[var(--color-surface)] border border-[var(--color-border)] p-8 rounded-xl shadow-md w-[400px]"
       >
         <h1 className="text-2xl font-semibold mb-6 text-[var(--color-text-primary)]">
-          Create Food Item
+          Create Reel
         </h1>
 
         <input
           type="text"
-          placeholder="Food Name"
+          placeholder="Reel Head"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text-primary)] p-2 mb-4 rounded outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
@@ -89,7 +89,7 @@ export default function CreateFoodPage() {
           disabled={loading}
           className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-text-on-primary)] py-2 rounded transition-colors"
         >
-          {loading ? "Uploading..." : "Create Food"}
+          {loading ? "Uploading..." : "Create Reel"}
         </button>
 
         {message && (
@@ -99,3 +99,4 @@ export default function CreateFoodPage() {
     </div>
   );
 }
+

@@ -10,7 +10,7 @@ import EditUserProfile from '../pages/user/EditUserProfile';
 import FoodPartnerRegister from '../pages/food-partner/FoodPartnerRegister';
 import FoodPartnerLogin from '../pages/food-partner/FoodPartnerLogin';
 import FoodPartnerProfile from '../pages/food-partner/FoodPartnerProfile';
-import CreateFood from '../pages/food/CreateFood';
+import CreateReel from '../pages/reel/CreateReel';
 import Inbox from '../pages/Messaging/Inbox';
 import ChatThread from '../pages/Messaging/ChatThread';
 import Search from '../pages/Search';
@@ -39,7 +39,7 @@ function AppRoutes() {
             <Route path='/user/profile' element={<UserProfile />} />
             <Route path='/user/profile/edit' element={<EditUserProfile />} />
             <Route path='/food-partner/profile' element={<FoodPartnerProfile />} />
-            <Route path='/create-food' element={<CreateFood />} />
+            <Route path='/create-reel' element={<CreateReel />} />
           </Route>
           {/* ChatThread has its own custom TopBar + input bar, no BottomNav needed */}
           <Route path='/messages/:conversationId' element={<ChatThread />} />
