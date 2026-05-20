@@ -5,12 +5,22 @@ function HomeReels() {
     const [videos, setVideos] = useState([])
     const [liked, setLiked] = useState({})
     const [saved, setSaved] = useState({})
-    const [following, setFollowing] = useState({})
+    const [isFollowing, setIsFollowing] = useState({});
 
     useEffect(() => {
         axios.get(`${import.meta.env.VITE_API_URL}/api/reel/`, { withCredentials: true })
             .then(response => {
-                setVideos(response.data.reel)
+                const reels = response.data.reel || []
+                setVideos(reels)
+
+                const initialFollowing = {}
+                reels.forEach((r) => {
+                    const creatorId = r?.creator?._id || r?.creator || r?.creatorId
+                    if (creatorId) {
+                        initialFollowing[creatorId] = !!r.isFollowed
+                    }
+                })
+                setIsFollowing(initialFollowing)
             })
     }, [])
 
@@ -22,8 +32,22 @@ function HomeReels() {
         setSaved(prev => ({ ...prev, [id]: !prev[id] }))
     }
 
-    const toggleFollow = (id) => {
-        setFollowing((prev) => ({ ...prev, [id]: !prev[id] }))
+    const handleFollow = async (creatorId) => {
+        if (!creatorId) return
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/creator/${creatorId}/follow`,
+                {},
+                {
+                    withCredentials: true
+                }
+            )
+            setIsFollowing((prev) => ({
+                ...prev,
+                [creatorId]: res.data.action === "followed"
+            }))
+        } catch (error) {
+            console.error("Follow request failed:", error)
+        }
     }
 
     async function likeVideo(reel) {
@@ -46,14 +70,17 @@ function HomeReels() {
         }
     }
 
+    
     return (
         <div className="h-full w-full snap-y snap-mandatory overflow-y-scroll bg-[var(--color-bg)]">
             {videos.map((reel) => (
                 <div
-                    key={reel._id}
-                    className="h-full w-full snap-center snap-always relative flex items-center justify-center px-3 pt-5 md:px-6 md:pt-7"
+                key={reel._id}
+                className="h-full w-full snap-center snap-always relative flex items-center justify-center px-3 pt-5 md:px-6 md:pt-7"
                 >
                     {(() => {
+                        const creatorId = reel?.creator?._id || reel?.creator || reel?.creatorId
+                        const followed = !!isFollowing[creatorId]
                         const creator = {
                             name: reel.creatorName || "Sandeep Maheswari",
                             avatar: reel.creatorAvatar || "https://i.pravatar.cc/96?img=12",
@@ -89,13 +116,13 @@ function HomeReels() {
 
                                             <button
                                                 type="button"
-                                                onClick={() => toggleFollow(reel._id)}
-                                                className={`h-8 min-w-[40px] rounded-2xl border border-1 text-[11px] leading-none px-3 transition-all ${following[reel._id]
-                                                        ? "bg-white text-black border-white"
-                                                        : "bg-white/10 text-white border-white/75 backdrop-blur-sm"
+                                                onClick={() => handleFollow(creatorId)}
+                                                className={`relative z-20 pointer-events-auto h-8 min-w-[40px] rounded-2xl border border-1 text-[11px] leading-none px-3 transition-all ${followed
+                                                    ? "bg-white text-black border-white"
+                                                    : "bg-white/10 text-white border-white/75 backdrop-blur-sm"
                                                     }`}
                                             >
-                                                {following[reel._id] ? "Following" : "Follow"}
+                                                {followed ? "Following" : "Follow"}
                                             </button>
                                         </div>
 

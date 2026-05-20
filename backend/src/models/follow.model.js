@@ -3,10 +3,12 @@ const mongoose = require("mongoose");
 const followSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
         required:true
     },
-    reel: {
+    creator: {
         type: mongoose.Schema.Types.ObjectId,
+        ref:"creator",
         required: true
     }
 })

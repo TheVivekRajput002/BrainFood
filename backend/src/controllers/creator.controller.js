@@ -1,5 +1,6 @@
 const creatorModel = require('../models/creator.model')
 const reelModel = require("../models/reel.model")
+const followModel = require("../models/follow.model")
 
 async function getCreatorById(req, res) {
 
@@ -22,7 +23,7 @@ async function getCreatorById(req, res) {
 
 }
 
-async function getCreatorProfile() {
+async function getCreatorProfile(req, res) {
     const creator = req.creator
 
     res.status(200).json({
@@ -35,7 +36,25 @@ async function getCreatorProfile() {
     })
 }
 
+async function followCreator(req, res) {
+    const creatorId = req.params.id
+    const userId = req.user._id
+
+    const existing = await followModel.findOne({ user:userId, creator:creatorId })
+
+    if (existing) {
+        
+        await followModel.deleteOne({ user:userId, creator:creatorId });
+        return res.json({ success: true, action: "unfollowed" });
+    } else {
+    
+        await followModel.create({ user:userId, creator:creatorId });
+        return res.json({ success: true, action: "followed" });
+    }
+}
+
 module.exports = {
+    followCreator,
     getCreatorById,
     getCreatorProfile
 }

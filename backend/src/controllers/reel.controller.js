@@ -1,6 +1,7 @@
 const reelModel = require("../models/reel.model")
 const likeModel = require("../models/likes.model")
 const saveModel = require("../models/save.model")
+const followModel = require("../models/follow.model")
 const { uploadFile } = require("../services/storage.service")
 const { v4: uuid } = require("uuid")
 
@@ -23,9 +24,20 @@ async function createReel(req, res) {
 
 async function getReel(req, res) {
     const reel = await reelModel.find({});
+    const follows = await followModel.find({ user: req.user._id }).select("creator");
+    const followedCreatorIds = new Set(follows.map((f) => String(f.creator)));
+
+    const reelWithFollowState = reel.map((r) => {
+        const creatorId = String(r.creator);
+        return {
+            ...r.toObject(),
+            isFollowed: followedCreatorIds.has(creatorId)
+        };
+    });
+
     res.status(200).json({
         message: "reels fetched successfully",
-        reel
+        reel: reelWithFollowState
     })
 }
 

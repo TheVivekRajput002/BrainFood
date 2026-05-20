@@ -1,0 +1,2 @@
+- use Tailwind CSS and use color variable from app.css
+- never change anything in /backend directory until specially mentioned 
