@@ -10,3 +10,6 @@ const followSchema = new mongoose.Schema({
         required: true
     }
 })
+
+const followModel = mongoose.model("follow", followSchema)
+module.exports = followModel;
