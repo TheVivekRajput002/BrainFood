@@ -1,4 +1,5 @@
 const creatorModel = require('../models/creator.model')
+const userModel = require('../models/user.model')
 const reelModel = require("../models/reel.model")
 const followModel = require("../models/follow.model")
 
@@ -43,12 +44,14 @@ async function followCreator(req, res) {
     const existing = await followModel.findOne({ user:userId, creator:creatorId })
 
     if (existing) {
-        
         await followModel.deleteOne({ user:userId, creator:creatorId });
+        await userModel.findByIdAndUpdate(userId, { $inc : { followingCount: -1 } })
         return res.json({ success: true, action: "unfollowed" });
+
     } else {
-    
+        
         await followModel.create({ user:userId, creator:creatorId });
+        await userModel.findByIdAndUpdate(userId, { $inc : { followingCount: +1 } })
         return res.json({ success: true, action: "followed" });
     }
 }

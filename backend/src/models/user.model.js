@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
     profile_picture:{
         type:String,
     },
+    bio: {
+        type: String,
+        default: "new user"
+    },
     username: {
         type: String,
         required: true,
@@ -25,7 +29,11 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String
-    }
+    },
+    followingCount: {
+        type: Number,
+        default: 0
+    },
 },
     {
         timestamps: true

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import {
     buildInitialFollowState,
@@ -36,6 +36,10 @@ function HomeReels() {
     const [liked, setLiked] = useState({})
     const [saved, setSaved] = useState({})
     const [isFollowing, setIsFollowing] = useState({})
+    const [mutedReels, setMutedReels] = useState({})
+    const [activeReelId, setActiveReelId] = useState(null)
+    const reelRefs = useRef({})
+    const videoRefs = useRef({})
 
     useEffect(() => {
         axios.get(`${import.meta.env.VITE_API_URL}/api/reel/`, { withCredentials: true })
@@ -45,7 +49,84 @@ function HomeReels() {
                 setIsFollowing(buildInitialFollowState(reels))
                 setLiked(buildInitialLikedState(reels))
                 setSaved(buildInitialSavedState(reels))
+                setMutedReels(
+                    reels.reduce((state, reel) => {
+                        if (reel?._id) {
+                            state[reel._id] = false
+                        }
+
+                        return state
+                    }, {})
+                )
             })
+    }, [])
+
+    useEffect(() => {
+        if (!videos.length) {
+            setActiveReelId(null)
+            return
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visibleEntries = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((firstEntry, secondEntry) => secondEntry.intersectionRatio - firstEntry.intersectionRatio)
+
+                if (visibleEntries.length > 0) {
+                    const nextActiveReelId = visibleEntries[0].target.dataset.reelId
+
+                    if (nextActiveReelId) {
+                        setActiveReelId(nextActiveReelId)
+                    }
+                }
+            },
+            {
+                threshold: [0.35, 0.6, 0.8],
+            }
+        )
+
+        Object.values(reelRefs.current).forEach((reelElement) => {
+            if (reelElement) {
+                observer.observe(reelElement)
+            }
+        })
+
+        return () => observer.disconnect()
+    }, [videos])
+
+    useEffect(() => {
+        videos.forEach((reel) => {
+            const videoElement = videoRefs.current[reel._id]
+
+            if (!videoElement) {
+                return
+            }
+
+            const isActiveReel = reel._id === activeReelId
+            videoElement.muted = mutedReels[reel._id] === true
+
+            if (isActiveReel) {
+                const playPromise = videoElement.play()
+
+                if (playPromise?.catch) {
+                    playPromise.catch(() => {})
+                }
+
+                return
+            }
+
+            videoElement.pause()
+            videoElement.currentTime = 0
+        })
+    }, [activeReelId, mutedReels, videos])
+
+    useEffect(() => {
+        return () => {
+            Object.values(videoRefs.current).forEach((videoElement) => {
+                videoElement?.pause()
+            })
+        }
     }, [])
 
     const handleFollow = async (creatorId) => {
@@ -93,6 +174,13 @@ function HomeReels() {
         }
     }
 
+    const handleMuteToggle = (reelId) => {
+        setMutedReels((prev) => ({
+            ...prev,
+            [reelId]: !prev[reelId],
+        }))
+    }
+
     return (
         <div className="h-[calc(100dvh-60px)] w-full snap-y snap-mandatory overflow-x-hidden overflow-y-scroll bg-black md:h-full md:bg-[var(--color-bg)]">
             {videos.map((reel) => {
@@ -107,18 +195,35 @@ function HomeReels() {
                 return (
                     <div
                         key={reel._id}
+                        ref={(element) => {
+                            if (element) {
+                                reelRefs.current[reel._id] = element
+                                return
+                            }
+
+                            delete reelRefs.current[reel._id]
+                        }}
+                        data-reel-id={reel._id}
                         className="relative flex h-[calc(100dvh-60px)] w-full snap-center snap-always items-center justify-center px-0 pt-0 md:h-full md:px-6 md:pt-7"
                     >
                         <div className="flex h-[calc(100dvh-60px)] w-full max-w-none items-center justify-center gap-0 md:h-[92dvh] md:max-w-[940px] md:gap-6">
                             <div className="relative h-full w-full max-h-none overflow-hidden rounded-none border-0 bg-black shadow-none md:max-h-[94dvh] md:w-auto md:aspect-[9/16] md:rounded-2xl md:border md:border-[var(--color-border)] md:shadow-[var(--shadow-lg)]">
                                 <video
+                                    ref={(element) => {
+                                        if (element) {
+                                            videoRefs.current[reel._id] = element
+                                            return
+                                        }
+
+                                        delete videoRefs.current[reel._id]
+                                    }}
                                     src={reel.video}
                                     aria-label={reel.name}
                                     className="h-full w-full object-cover"
-                                    autoPlay
                                     loop
-                                    muted
+                                    muted={mutedReels[reel._id] === true}
                                     playsInline
+                                    preload="metadata"
                                 />
 
                                 <div className="absolute inset-0 bg-[var(--gradient-reel-overlay)]" />
@@ -198,12 +303,24 @@ function HomeReels() {
                                             <span className="text-[11px] font-medium text-white">{formatCount(reel.bookmarkCount)}</span>
                                         </button>
 
-                                        <button className="flex flex-col items-center gap-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleMuteToggle(reel._id)}
+                                            aria-label={mutedReels[reel._id] === true ? "Unmute reel" : "Mute reel"}
+                                            className="flex flex-col items-center gap-1"
+                                        >
                                             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-black/25 text-white backdrop-blur-sm">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.9}>
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l4 6M19 9l-4 6" />
-                                                </svg>
+                                                {mutedReels[reel._id] === true ? (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.9}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.5 8.25 5.25 7.5m0-7.5-5.25 7.5" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.9}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 9.75a4.5 4.5 0 0 1 0 4.5m2.25-6.75a7.5 7.5 0 0 1 0 9" />
+                                                    </svg>
+                                                )}
                                             </div>
                                         </button>
                                     </div>
@@ -237,11 +354,23 @@ function HomeReels() {
                                             {creator.caption}
                                             <span className="text-white/80"> ... more</span>
                                         </p>
-                                        <button className="mb-3 flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--color-divider)] bg-[color:var(--color-backdrop)] text-white">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.9}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l4 6M19 9l-4 6" />
-                                            </svg>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleMuteToggle(reel._id)}
+                                            aria-label={mutedReels[reel._id] === true ? "Unmute reel" : "Mute reel"}
+                                            className="mb-3 flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--color-divider)] bg-[color:var(--color-backdrop)] text-white"
+                                        >
+                                            {mutedReels[reel._id] === true ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.9}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.5 8.25 5.25 7.5m0-7.5-5.25 7.5" />
+                                                </svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.9}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H3v6h3.5L11 19V5Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 9.75a4.5 4.5 0 0 1 0 4.5m2.25-6.75a7.5 7.5 0 0 1 0 9" />
+                                                </svg>
+                                            )}
                                         </button>
                                     </div>
                                 </div>
