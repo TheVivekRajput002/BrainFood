@@ -1,102 +1,244 @@
-import axios from "axios"
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from 'axios'
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, Link2, PackagePlus, Search, Upload } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
-
-export default function CreateReelPage() {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [video, setVideo] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!video) {
-      setMessage("Please upload a video");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("description", description);
-      formData.append("video", video);
-
-
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/reel`, formData, { withCredentials: true })
-      console.log(response)
-
-      if (response.status === 201) {
-        setMessage("Reel created successfully");
-        setName("");
-        setDescription("");
-        setVideo(null);
-        navigate("/")
-      } else {
-        setMessage(response.data?.message || "Failed to create reel");
-      }
-    } catch (error) {
-      console.error(error);
-      setMessage("Server error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex justify-center items-center bg-[var(--color-bg)] px-6">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-[var(--color-surface)] border border-[var(--color-border)] p-8 rounded-xl shadow-md w-[400px]"
-      >
-        <h1 className="text-2xl font-semibold mb-6 text-[var(--color-text-primary)]">
-          Create Reel
-        </h1>
-
-        <input
-          type="text"
-          placeholder="Reel Head"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text-primary)] p-2 mb-4 rounded outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
-          required
-        />
-
-        <textarea
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[var(--color-text-primary)] p-2 mb-4 rounded outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
-          required
-        />
-
-        <input
-          type="file"
-          accept="video/*"
-          onChange={(e) => setVideo(e.target.files[0])}
-          className="mb-4 text-[var(--color-text-secondary)]"
-          required
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-text-on-primary)] py-2 rounded transition-colors"
-        >
-          {loading ? "Uploading..." : "Create Reel"}
-        </button>
-
-        {message && (
-          <p className="mt-4 text-center text-sm text-[var(--color-text-secondary)]">{message}</p>
-        )}
-      </form>
-    </div>
-  );
+function FieldShell({ label, children, className = '' }) {
+    return (
+        <label className={`block rounded-[20px] border border-[var(--color-border)] bg-[var(--color-lightgray)] px-4 py-3 ${className}`}>
+            <span className="block text-[12px] font-semibold text-[var(--color-text-secondary)]">{label}</span>
+            {children}
+        </label>
+    )
 }
 
+export default function CreateReelPage() {
+    const [name, setName] = useState('')
+    const [description, setDescription] = useState('')
+    const [video, setVideo] = useState(null)
+    const [previewUrl, setPreviewUrl] = useState('')
+    const [tagSearch, setTagSearch] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [message, setMessage] = useState('')
+
+    const fileInputRef = useRef(null)
+    const navigate = useNavigate()
+
+    const fileName = video?.name || ''
+    const fileTypeHint = video?.type?.startsWith('video/') ? 'Video selected' : ''
+
+    useEffect(() => {
+        if (!video) {
+            setPreviewUrl('')
+            return
+        }
+
+        const objectUrl = URL.createObjectURL(video)
+        setPreviewUrl(objectUrl)
+
+        return () => {
+            URL.revokeObjectURL(objectUrl)
+        }
+    }, [video])
+
+    const handleFileSelect = (file) => {
+        if (!file) {
+            return
+        }
+
+        setVideo(file)
+        setMessage('')
+    }
+
+    const handleFileChange = (event) => {
+        handleFileSelect(event.target.files?.[0])
+    }
+
+    const handleDrop = (event) => {
+        event.preventDefault()
+        handleFileSelect(event.dataTransfer.files?.[0])
+    }
+
+    const handleDragOver = (event) => {
+        event.preventDefault()
+    }
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+
+        if (!video) {
+            setMessage('Please upload a video')
+            return
+        }
+
+        try {
+            setLoading(true)
+            setMessage('')
+
+            const formData = new FormData()
+            formData.append('name', name)
+            formData.append('description', description)
+            formData.append('video', video)
+
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/reel`, formData, {
+                withCredentials: true,
+            })
+
+            if (response.status === 201) {
+                setMessage('Reel created successfully')
+                setName('')
+                setDescription('')
+                setTagSearch('')
+                setVideo(null)
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = ''
+                }
+                navigate('/')
+            } else {
+                setMessage(response.data?.message || 'Failed to create reel')
+            }
+        } catch (error) {
+            console.error(error)
+            setMessage('Server error')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <div className="min-h-[100dvh] bg-[var(--color-bg)] px-4 py-4 text-[var(--color-text-primary)] md:px-6 md:py-5">
+            <div className="mx-auto max-w-[1280px]">
+            
+                    <div className="space-y-1 mb-4 ml-3 mt-2">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+                            Creator Studio
+                        </p>
+                        <h1 className="text-[26px] font-semibold tracking-[-0.02em] md:text-[32px]">Create Reel</h1>
+                    </div>
+                   
+               
+ 
+                <form onSubmit={handleSubmit} className="grid xl:grid-cols-[310px_minmax(0,1fr)] rounded-[28px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
+                    
+                        <div
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex w-full max-w-[290px] aspect-[9/16] cursor-pointer flex-col items-center justify-between rounded-[24px] border border-[var(--color-border)] bg-[var(--color-lightgray)]  text-center transition hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)]"
+                        >
+                            {previewUrl ? (
+                                <div className="relative h-full w-full overflow-hidden rounded-[24px]">
+                                    <video
+                                        src={previewUrl}
+                                        controls
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        className="h-full w-full object-cover"
+                                        onClick={(event) => event.stopPropagation()}
+                                    />
+                                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-[var(--gradient-reel-overlay)] px-4 py-4 text-left">
+                                        <p className="truncate text-sm font-semibold text-white">
+                                            {fileName}
+                                        </p>
+                                        <p className="mt-1 text-xs text-white/80">
+                                            Tap anywhere to replace this video
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex flex-1 flex-col items-center justify-center">
+                                        <div className="mb-5 grid h-12 w-12 place-items-center rounded-full border-2 border-[var(--color-text-primary)] text-[var(--color-text-primary)]">
+                                            <Upload className="h-6 w-6" />
+                                        </div>
+                                        <p className="max-w-[230px] text-[18px] font-semibold leading-8 text-[var(--color-text-primary)]">
+                                            {fileName ? fileName : 'Choose a file or drag and drop it here'}
+                                        </p>
+                                        <p className="mt-2 text-[13px] text-[var(--color-text-secondary)]">
+                                            {fileTypeHint || 'Your reel file will be uploaded securely.'}
+                                        </p>
+                                    </div>
+
+                                   
+                                </>
+                            )}
+                        </div>
+
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="video/*"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            required
+                        />
+
+                    
+
+                    <section className="space-y-3">
+                        <FieldShell label="Title">
+                            <input
+                                type="text"
+                                placeholder="Tell everyone what your reel is about"
+                                value={name}
+                                onChange={(event) => setName(event.target.value)}
+                                className="mt-2 w-full bg-transparent text-[14px] font-medium text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)] md:text-[16px]"
+                                required
+                            />
+                        </FieldShell>
+
+                        <FieldShell label="Description">
+                            <textarea
+                                placeholder="Describe your reel"
+                                value={description}
+                                onChange={(event) => setDescription(event.target.value)}
+                                rows="4"
+                                className="mt-2 w-full resize-none bg-transparent text-[17px] leading-8 text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
+                                required
+                            />
+                        </FieldShell>
+
+                        <FieldShell label="Tagged topics (0)">
+                            <div className="mt-2 flex items-center gap-3">
+                                <Search className="h-4 w-4 text-[var(--color-text-muted)]" />
+                                <input
+                                    type="text"
+                                    placeholder="Search for a tag"
+                                    value={tagSearch}
+                                    onChange={(event) => setTagSearch(event.target.value)}
+                                    className="w-full bg-transparent text-[17px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
+                                />
+                            </div>
+                        </FieldShell>
+
+                        
+
+                        <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-xs)]">
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                    <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">Ready to publish?</p>
+                                    <p className="mt-1 text-[13px] text-[var(--color-text-secondary)]">
+                                        Double-check your title, description, and selected video before uploading.
+                                    </p>
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="rounded-[18px] bg-[var(--color-primary)] px-6 py-3 text-[15px] font-semibold text-[var(--color-text-on-primary)] transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-70"
+                                >
+                                    {loading ? 'Uploading...' : 'Create Reel'}
+                                </button>
+                            </div>
+
+                            {message && (
+                                <p className="mt-4 text-[13px] font-medium text-[var(--color-text-secondary)]">{message}</p>
+                            )}
+                        </div>
+                    </section>
+                </form>
+            </div>
+        </div>
+    )
+}

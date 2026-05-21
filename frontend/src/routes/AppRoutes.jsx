@@ -35,7 +35,6 @@ function AppRoutes() {
             <Route path='/search' element={<Search />} />
             <Route path='/saved' element={<Saved />} />
             <Route path='/messages' element={<Inbox />} />
-            <Route path='/creator/:id' element={<CreatorProfile />} />
             <Route path='/user/profile' element={<UserProfile />} />
             <Route path='/user/profile/edit' element={<EditUserProfile />} />
             <Route path='/creator/profile' element={<CreatorProfile />} />

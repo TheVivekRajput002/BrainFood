@@ -6,7 +6,7 @@ import { Settings } from 'lucide-react'
 const PROFILE_STATS = {
     posts: 14,
     followers: 547,
-    following: 5000000000,
+    following: 404,
 }
 
 const PROFILE_HIGHLIGHTS = [
@@ -72,12 +72,21 @@ function UserProfile() {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
     const [savedReels, setSavedReels] = useState([])
+    const [error, setError] = useState('')
     const navigate = useNavigate()
 
     useEffect(() => {
         axios.get(`${import.meta.env.VITE_API_URL}/api/auth/user/profile`, { withCredentials: true })
             .then(response => {
-                setUser(response.data.user)
+                const profile = response.data?.user
+
+                if (!profile) {
+                    setError('Profile data could not be loaded.')
+                    setLoading(false)
+                    return
+                }
+
+                setUser(profile)
                 setLoading(false)
             })
             .catch(() => {
@@ -89,10 +98,11 @@ function UserProfile() {
     useEffect(() => {
         axios.get(`${import.meta.env.VITE_API_URL}/api/reel/savedReels`, { withCredentials: true })
             .then(response => {
-                setSavedReels(response.data.savedReels)
+                setSavedReels(Array.isArray(response.data?.savedReels) ? response.data.savedReels : [])
             })
-            .catch(() => {
-                navigate('/user/login', { replace: true })
+            .catch((errorLogMsg) => {
+                console.error('Saved reels could not be loaded', errorLogMsg)
+                setSavedReels([])
             })
     }, [navigate])
 
@@ -119,7 +129,20 @@ function UserProfile() {
     }
 
     if (!user) {
-        return null
+        return (
+            <div className="flex min-h-[100dvh] items-center justify-center bg-[var(--color-bg)] px-6 text-center text-[var(--color-text-primary)]">
+                <div>
+                    <p className="text-lg font-semibold">{error || 'Profile not available right now.'}</p>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/user/login', { replace: true })}
+                        className="mt-4 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-text-on-primary)]"
+                    >
+                        Go to login
+                    </button>
+                </div>
+            </div>
+        )
     }
 
     const profileName = user.name || 'Vivek Rajput'
@@ -224,7 +247,7 @@ function UserProfile() {
                             <div className="mt-3 flex items-center gap-10">
                                 <p className="text-base"><span className="font-semibold">{PROFILE_STATS.posts}</span> posts</p>
                                 <p className="text-base"><span className="font-semibold">{PROFILE_STATS.followers}</span> followers</p>
-                                <p className="text-base"><span className="font-semibold">{PROFILE_STATS.following}</span> following</p>
+                                <p className="text-base"><span className="font-semibold">{user.followingCount}</span> following</p>
                             </div>
                             <div className="mt-5">
                                 <p className="text-sm font-semibold">{profileName}</p>
@@ -276,8 +299,12 @@ function UserProfile() {
 
                 <section className="grid grid-cols-3 gap-[1px] bg-[var(--color-border)]">
                     {savedReels.map((item) => (
-                        <div key={item._id} className="relative aspect-square overflow-hidden bg-[var(--color-surface)]">
-                            <img src={item.reel.thumbnail}  alt={`Post ${item.reel.name}`} className="h-full w-full object-cover" />
+                        <div key={item._id} className="relative aspect-[4/5] overflow-hidden bg-[var(--color-surface)]">
+                            <img
+                                src={item.reel?.thumbnail || profileImage}
+                                alt={`Post ${item.reel?.name || 'saved reel'}`}
+                                className="h-full w-full object-cover"
+                            />
                             <div className="absolute right-2 top-2 h-4 w-4 rounded-[4px] border-2 border-white/95" />
                         </div>
                     ))}
