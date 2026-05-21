@@ -66,9 +66,11 @@ function formatCompactNumber(value) {
 export default function CreatorProfile() {
     const [profile, setProfile] = useState(null)
     const [draftProfile, setDraftProfile] = useState(null)
-    const [reels, setReels] = useState([])
+    const [reelCount, setReelCount] = useState(0)
     const [editingSection, setEditingSection] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+    const [photoPreview, setPhotoPreview] = useState('')
     const [error, setError] = useState('')
     const navigate = useNavigate()
 
@@ -86,7 +88,7 @@ export default function CreatorProfile() {
 
                 setProfile(creator)
                 setDraftProfile(creator)
-                setReels(Array.isArray(response.data?.reels) ? response.data.reels : [])
+                setReelCount(Array.isArray(response.data?.reels) ? response.data.reels.length : 0)
                 setLoading(false)
             })
             .catch((fetchError) => {
@@ -95,6 +97,14 @@ export default function CreatorProfile() {
                 setLoading(false)
             })
     }, [])
+
+    useEffect(() => {
+        return () => {
+            if (photoPreview) {
+                URL.revokeObjectURL(photoPreview)
+            }
+        }
+    }, [photoPreview])
 
     const completedWeight = PROFILE_TASKS.reduce((sum, task) => {
         const value = draftProfile?.[task.key]
@@ -109,32 +119,68 @@ export default function CreatorProfile() {
         })),
     }
 
-    const followers = Number(draftProfile?.followers) || 0
+    const followersCount = Number(draftProfile?.followersCount) || 0
     const customerServed = Number(draftProfile?.customerServed) || 0
     const customerLabel = formatCompactNumber(customerServed)
     const creatorName = draftProfile?.name || 'Your food brand'
     const creatorImage = draftProfile?.profile_picture || 'https://i.pinimg.com/736x/f5/47/d8/f547d800625af9056d62efe8969aeea0.jpg'
     const stats = [
-        { label: 'Followers', value: followers },
+        { label: 'Followers', value: followersCount },
         { label: 'Reach', value: customerLabel },
-        { label: 'Posts', value: reels.length },
+        { label: 'Posts', value: reelCount },
     ]
 
-    const handleAvatarChange = (event) => {
+    const handleAvatarChange = async (event) => {
         const file = event.target.files?.[0]
 
         if (!file) {
             return
         }
 
-        const reader = new FileReader()
-        reader.onload = (loadEvent) => {
-            setDraftProfile((current) => ({
-                ...current,
-                profile_picture: loadEvent.target?.result,
-            }))
+        if (photoPreview) {
+            URL.revokeObjectURL(photoPreview)
         }
-        reader.readAsDataURL(file)
+
+        const nextPreview = URL.createObjectURL(file)
+        setPhotoPreview(nextPreview)
+        setDraftProfile((current) => (
+            current
+                ? { ...current, profile_picture: nextPreview }
+                : current
+        ))
+
+        try {
+            setIsUploadingPhoto(true)
+            const formData = new FormData()
+            formData.append('image', file)
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/creator/profile-picture`,
+                formData,
+                { withCredentials: true }
+            )
+
+            const nextProfilePicture =
+                response.data?.profile_picture ||
+                response.data?.creator?.profile_picture ||
+                nextPreview
+
+            setProfile((current) => (
+                current
+                    ? { ...current, profile_picture: nextProfilePicture }
+                    : current
+            ))
+            setDraftProfile((current) => (
+                current
+                    ? { ...current, profile_picture: nextProfilePicture }
+                    : current
+            ))
+        } catch (uploadError) {
+            console.error('Creator profile picture upload failed:', uploadError.response?.data || uploadError.message)
+        } finally {
+            setIsUploadingPhoto(false)
+            event.target.value = ''
+        }
     }
 
     const handleInputChange = (event) => {
@@ -197,7 +243,7 @@ export default function CreatorProfile() {
                                     <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
 
                                         <img
-                                            src={draftProfile.profile_picture}
+                                            src={creatorImage}
                                             alt={draftProfile.name || 'Creator profile'}
                                             className="h-24 w-24 rounded-full object-cover"
                                         />
@@ -219,11 +265,12 @@ export default function CreatorProfile() {
                                         <div className="flex flex-col gap-3">
                                             <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[var(--color-surface-raised)] px-4 py-2 text-sm font-semibold text-[var(--color-text-primary)] transition hover:bg-[var(--color-hover)]">
                                                 <ImageUp className="h-4 w-4 text-[var(--color-primary)]" />
-                                                Upload new photo
+                                                {isUploadingPhoto ? 'Uploading...' : 'Upload new photo'}
                                                 <input
                                                     type="file"
                                                     accept="image/png,image/jpeg"
                                                     onChange={handleAvatarChange}
+                                                    disabled={isUploadingPhoto}
                                                     className="hidden"
                                                 />
                                             </label>
@@ -332,30 +379,6 @@ export default function CreatorProfile() {
                             )}
                         </section>
 
-                        {reels.length > 0 ? (
-                            <section className="border-t border-[var(--color-border)] pt-4">
-                                <div className="grid grid-cols-3">
-                                    {reels.map((reel) => (
-                                        <div key={reel._id} className="relative aspect-[9/16] overflow-hidden bg-[var(--color-surface)]">
-                                            <img
-                                                src={reel.thumbnail || creatorImage}
-                                                alt={reel.name || 'Creator reel'}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        ) : (
-                            <section className="rounded-[32px] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] px-5 py-10 text-center">
-                                <p className="text-sm font-semibold text-[var(--color-text-primary)]">
-                                    No reels yet
-                                </p>
-                                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                                    Your uploaded reels will appear here in a simple profile grid.
-                                </p>
-                            </section>
-                        )}
                     </main>
 
                     <aside className="space-y-6">

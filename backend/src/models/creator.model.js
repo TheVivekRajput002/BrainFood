@@ -17,6 +17,11 @@ const creatorSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    followersCount: {
+        type: Number,
+        default: 0,
+        required: true
     }
 },
     { timestamps: true }

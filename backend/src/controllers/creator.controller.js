@@ -2,6 +2,8 @@ const creatorModel = require('../models/creator.model')
 const userModel = require('../models/user.model')
 const reelModel = require("../models/reel.model")
 const followModel = require("../models/follow.model")
+const { uploadFile } = require("../services/storage.service")
+const { v4: uuid } = require("uuid")
 
 async function getCreatorById(req, res) {
 
@@ -44,18 +46,45 @@ async function followCreator(req, res) {
     if (existing) {
         await followModel.deleteOne({ user: userId, creator: creatorId });
         await userModel.findByIdAndUpdate(userId, { $inc: { followingCount: -1 } })
+        await creatorModel.findByIdAndUpdate(creatorId, { $inc: { followersCount: -1 } })
         return res.json({ success: true, action: "unfollowed" });
-
+        
     } else {
-
+        
         await followModel.create({ user: userId, creator: creatorId });
         await userModel.findByIdAndUpdate(userId, { $inc: { followingCount: +1 } })
+        await creatorModel.findByIdAndUpdate(creatorId, { $inc: { followersCount: +1 } })
         return res.json({ success: true, action: "followed" });
     }
+}
+
+async function updateCreatorProfile(req, res) {
+    const creator = req.creator
+    
+    if (!req.file) {
+        return res.status(400).json({
+            message: "profile picture file is required",
+        })
+    }
+
+    const uploadFileResult = await uploadFile(req.file.buffer, uuid())
+    const profilePicture = uploadFileResult.url
+
+    await creatorModel.findByIdAndUpdate(
+        creator._id,
+        { profile_picture: profilePicture },
+        { new: true }
+    )
+
+    res.status(201).json({
+        message: "profile picture updated succesfully",
+        profile_picture: profilePicture,
+    })
 }
 
 module.exports = {
     followCreator,
     getCreatorById,
-    getCreatorProfile
+    getCreatorProfile,
+    updateCreatorProfile
 }

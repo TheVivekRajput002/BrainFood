@@ -14,7 +14,7 @@ async function updateUserProfile(req, res) {
 
     const uploadFileResult = await uploadFile(req.file.buffer, uuid())
 
-    const new_user = await userModel.findByIdAndUpdate(
+    await userModel.findByIdAndUpdate(
         user._id,
         { profile_picture: uploadFileResult.url },
         { new: true }
@@ -22,7 +22,6 @@ async function updateUserProfile(req, res) {
 
     res.status(201).json({
         message: "profile picture updated succesfully",
-        profile_picture: new_user.profile_picture,
     })
 }
 
