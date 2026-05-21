@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Home from '../pages/Home';
-import Saved from '../pages/Saved';
 import UserProfile from '../pages/user/UserProfile';
 import UserRegister from '../pages/user/UserRegister';
 import UserLogin from '../pages/user/UserLogin';
@@ -15,6 +14,8 @@ import CreateReel from '../pages/reel/CreateReel';
 import Inbox from '../pages/Messaging/Inbox';
 import ChatThread from '../pages/Messaging/ChatThread';
 import Search from '../pages/Search';
+import StackScroll from '../pages/stack/StackScroll';
+import StackDetail from '../pages/stack/StackDetail';
 
 import Layout from '../components/Layout';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -34,7 +35,8 @@ function AppRoutes() {
           <Route element={<Layout />}>
             <Route path='/' element={<Home />} />
             <Route path='/search' element={<Search />} />
-            <Route path='/saved' element={<Saved />} />
+            <Route path='/stack' element={<StackScroll />} />
+            <Route path='/stack/:id' element={<StackDetail />} />
             <Route path='/messages' element={<Inbox />} />
             <Route path='/user/profile' element={<UserProfile />} />
             <Route path='/user/profile/edit' element={<EditUserProfile />} />
