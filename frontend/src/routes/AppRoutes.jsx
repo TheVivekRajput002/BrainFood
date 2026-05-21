@@ -16,6 +16,7 @@ import ChatThread from '../pages/Messaging/ChatThread';
 import Search from '../pages/Search';
 import StackScroll from '../pages/stack/StackScroll';
 import StackDetail from '../pages/stack/StackDetail';
+import StackCreate from '../pages/stack/StackCreate';
 
 import Layout from '../components/Layout';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -36,6 +37,7 @@ function AppRoutes() {
             <Route path='/' element={<Home />} />
             <Route path='/search' element={<Search />} />
             <Route path='/stack' element={<StackScroll />} />
+            <Route path='/stack/create' element={<StackCreate />} />
             <Route path='/stack/:id' element={<StackDetail />} />
             <Route path='/messages' element={<Inbox />} />
             <Route path='/user/profile' element={<UserProfile />} />

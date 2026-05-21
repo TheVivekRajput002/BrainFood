@@ -2,6 +2,7 @@ const express = require("express")
 const cookieParser = require("cookie-parser")
 require('dotenv').config();
 const authRoutes = require("./routes/auth.route")
+const stackRoutes = require("./routes/stack.route")
 const userRoutes = require("./routes/user.route")
 const reelRoutes = require("./routes/reel.route")
 const creatorRoutes = require("./routes/creator.route")
@@ -49,6 +50,7 @@ app.use("/api/auth", authLimiter)
 app.use("/api/auth", authRoutes)
 app.use("/api/user", userRoutes)
 app.use("/api/reel", reelRoutes)
+app.use("/api/stack", stackRoutes)
 app.use("/api/creator", creatorRoutes)
 
 module.exports = app;

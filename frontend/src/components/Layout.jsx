@@ -1,10 +1,13 @@
 import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import BottomNav from './BottomNav';
 import DesktopSidebar from './DesktopSidebar';
+import CreateQuickActions from './CreateQuickActions';
 
 export default function Layout() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [isCreateMenuOpen, setIsCreateMenuOpen] = React.useState(false);
     const [themeMode, setThemeMode] = React.useState(() => {
         const savedTheme = localStorage.getItem('themeMode');
         if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
@@ -18,11 +21,26 @@ export default function Layout() {
         localStorage.setItem('themeMode', themeMode);
     }, [themeMode]);
 
+    React.useEffect(() => {
+        setIsCreateMenuOpen(false);
+    }, [location.pathname]);
+
+    const handleCreateOptionSelect = React.useCallback((option) => {
+        setIsCreateMenuOpen(false);
+
+        if (option === 'stack') {
+            navigate('/stack/create');
+            return;
+        }
+
+        navigate('/create-reel');
+    }, [navigate]);
+
     return (
         <div className="min-h-screen bg-[var(--color-bg)]">
             <DesktopSidebar
                 canCreate={isCreator}
-                onCreateClick={() => navigate('/create-reel')}
+                onCreateClick={() => setIsCreateMenuOpen((prev) => !prev)}
                 themeMode={themeMode}
                 onToggleTheme={() => setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'))}
             />
@@ -35,8 +53,16 @@ export default function Layout() {
             </main>
             
             <div className="fixed bottom-0 left-0 w-full z-50 md:hidden">
-                <BottomNav canCreate={isCreator} onCreateClick={() => navigate('/create-reel')} />
+                <BottomNav canCreate={isCreator} onCreateClick={() => setIsCreateMenuOpen((prev) => !prev)} />
             </div>
+
+            {isCreator && (
+                <CreateQuickActions
+                    isOpen={isCreateMenuOpen}
+                    onClose={() => setIsCreateMenuOpen(false)}
+                    onSelect={handleCreateOptionSelect}
+                />
+            )}
         </div>
     );
 }

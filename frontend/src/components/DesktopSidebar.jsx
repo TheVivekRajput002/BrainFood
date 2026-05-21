@@ -12,7 +12,6 @@ export default function DesktopSidebar({ canCreate, onCreateClick, themeMode, on
         ? [
             { name: 'Reels', path: '/creator/reels', icon: Video },
             { name: 'Messages', path: '/messages', icon: MessageCircle },
-            { name: 'Stack', path: '/stack', icon: BookOpenText },
             { name: 'Profile', path: profilePath, icon: User },
         ]
         : [

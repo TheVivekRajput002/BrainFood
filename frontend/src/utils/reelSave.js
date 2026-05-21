@@ -5,7 +5,7 @@ export const SAVED_STORAGE_KEY = "home_reels_saved_state"
 export function readSavedReels() {
     try {
         return JSON.parse(localStorage.getItem(SAVED_STORAGE_KEY) || "{}")
-    } catch (error) {
+    } catch {
         return {}
     }
 }

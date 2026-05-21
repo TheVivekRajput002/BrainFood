@@ -38,6 +38,8 @@ function HomeReels() {
     const [isFollowing, setIsFollowing] = useState({})
     const [mutedReels, setMutedReels] = useState({})
     const [activeReelId, setActiveReelId] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [loadError, setLoadError] = useState('')
     const reelRefs = useRef({})
     const videoRefs = useRef({})
 
@@ -46,6 +48,7 @@ function HomeReels() {
             .then(response => {
                 const reels = response.data.reel || []
                 setVideos(reels)
+                setActiveReelId(reels[0]?._id || null)
                 setIsFollowing(buildInitialFollowState(reels))
                 setLiked(buildInitialLikedState(reels))
                 setSaved(buildInitialSavedState(reels))
@@ -58,12 +61,20 @@ function HomeReels() {
                         return state
                     }, {})
                 )
+                setLoadError('')
+            })
+            .catch((error) => {
+                console.error('Failed to load reels:', error)
+                setVideos([])
+                setLoadError('Unable to load reels. Check that the backend is running and VITE_API_URL is correct.')
+            })
+            .finally(() => {
+                setLoading(false)
             })
     }, [])
 
     useEffect(() => {
         if (!videos.length) {
-            setActiveReelId(null)
             return
         }
 
@@ -122,8 +133,10 @@ function HomeReels() {
     }, [activeReelId, mutedReels, videos])
 
     useEffect(() => {
+        const currentVideoRefs = videoRefs.current
+
         return () => {
-            Object.values(videoRefs.current).forEach((videoElement) => {
+            Object.values(currentVideoRefs).forEach((videoElement) => {
                 videoElement?.pause()
             })
         }
@@ -179,6 +192,38 @@ function HomeReels() {
             ...prev,
             [reelId]: !prev[reelId],
         }))
+    }
+
+    if (loading) {
+        return (
+            <div className="flex h-[calc(100dvh-60px)] w-full items-center justify-center bg-[var(--color-bg)] px-6 text-center text-[var(--color-text-secondary)] md:h-full">
+                Loading reels...
+            </div>
+        )
+    }
+
+    if (loadError) {
+        return (
+            <div className="flex h-[calc(100dvh-60px)] w-full items-center justify-center bg-[var(--color-bg)] px-6 text-center md:h-full">
+                <div className="max-w-md rounded-3xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 text-[var(--color-text-primary)] shadow-[var(--shadow-card)]">
+                    <p className="text-lg font-semibold">Feed unavailable</p>
+                    <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{loadError}</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (!videos.length) {
+        return (
+            <div className="flex h-[calc(100dvh-60px)] w-full items-center justify-center bg-[var(--color-bg)] px-6 text-center md:h-full">
+                <div className="max-w-md rounded-3xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 text-[var(--color-text-primary)] shadow-[var(--shadow-card)]">
+                    <p className="text-lg font-semibold">No reels yet</p>
+                    <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+                        The feed is connected, but there is no reel data to display yet.
+                    </p>
+                </div>
+            </div>
+        )
     }
 
     return (

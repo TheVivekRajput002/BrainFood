@@ -5,7 +5,7 @@ export const LIKED_STORAGE_KEY = "home_reels_liked_state"
 export function readLikedReels() {
     try {
         return JSON.parse(localStorage.getItem(LIKED_STORAGE_KEY) || "{}")
-    } catch (error) {
+    } catch {
         return {}
     }
 }

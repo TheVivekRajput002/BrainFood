@@ -3,3 +3,4 @@
 - keep the code more readable and maintainable
 - follow industry standards but keep simplicity and avoid complexity
 - check the other similar features features and maintain the consistency
+- never use .env

@@ -11,14 +11,14 @@ const stackSchema = new mongoose.Schema({
         required: true
     },
     tags: {
-        type: [String]
+        type: [String],
+        default: ["learning"]
     },
     cards: {
         type: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: "card"
         }],
-        required: true
     },
     totalPoints: {
         type: Number,

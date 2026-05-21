@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 
 
-function creatorLogin() {
+function CreatorLogin() {
 
     const navigate = useNavigate();
 
@@ -100,4 +100,4 @@ function creatorLogin() {
     )
 }
 
-export default creatorLogin
+export default CreatorLogin

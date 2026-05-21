@@ -26,6 +26,7 @@ export default function StackDetail() {
     const { id } = useParams()
 
     const stack = getStackById(id)
+    
 
     if (!stack) {
         return (

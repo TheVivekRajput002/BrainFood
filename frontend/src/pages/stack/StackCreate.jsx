@@ -1,0 +1,353 @@
+import { useMemo, useState } from 'react'
+import { BookOpenText, Bookmark, Eye, Headphones, ImagePlus, PenLine, Share2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import axios from "axios"
+
+const DEFAULT_COVER =
+    'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=900&q=80'
+
+const INITIAL_FORM = {
+    title: '',
+    author: '',
+    cover: DEFAULT_COVER,
+    insightTitle: '',
+    insightOne: '',
+}
+
+function BookCover({ cover }) {
+    return (
+        <div className="relative h-[18rem] w-[13rem] overflow-hidden rounded-[1.35rem] border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-lg)]">
+            <div className="absolute inset-y-0 left-0 w-3 bg-[var(--color-text-primary)]/80" />
+            <img
+                src={cover}
+                alt={`cover`}
+                className="h-full w-full object-cover"
+            />
+        </div>
+    )
+}
+
+function FormField({ label, children, hint }) {
+    return (
+        <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-[var(--color-text-primary)]">
+                {label}
+            </span>
+            {children}
+            {hint ? (
+                <span className="mt-2 block text-xs text-[var(--color-text-secondary)]">
+                    {hint}
+                </span>
+            ) : null}
+        </label>
+    )
+}
+
+function getPreviewParagraphs(form) {
+    return [form.insightOne].filter(Boolean)
+}
+
+function StackDetailPreview({ stack }) {
+    return (
+        <div className="flex w-full flex-col items-center px-4 py-8 text-[var(--color-text-primary)] sm:px-6 sm:py-10">
+            <header className="w-full max-w-xl text-center">
+                <div className="flex justify-center">
+                    <BookCover
+                        cover={stack.cover}
+                    />
+                </div>
+
+                <div className="mt-6 space-y-2">
+                    <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
+                        {stack.title}
+                    </h1>
+                    <div className="flex items-center justify-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                        <PenLine className="h-4 w-4" />
+                        <span>{stack.author}</span>
+                    </div>
+                </div>
+
+                <div className="mt-6 flex items-center justify-center">
+                    <button
+                        type="button"
+                        className="inline-flex items-center gap-3 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-[var(--color-text-on-primary)] shadow-[var(--shadow-primary)] transition hover:bg-[var(--color-primary-hover)]"
+                    >
+                        <span>Read</span>
+                        <span className="h-4 w-px bg-white/30" />
+                        <Headphones className="h-4 w-4" />
+                    </button>
+                </div>
+            </header>
+
+            <div className="mt-10 w-full max-w-xl">
+                <article className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-md)] sm:p-8">
+                    <header>
+                        <h2 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
+                            {stack.insightTitle}
+                        </h2>
+                    </header>
+
+                    <section className="mt-5 space-y-5 font-serif text-[1rem] leading-7 text-[var(--color-text-primary)] sm:text-[1.05rem]">
+                        {stack.paragraphs.map((paragraph, index) => (
+                            <p key={`preview-paragraph-${index}`}>
+                                {index === 0 ? (
+                                    <>
+                                        <strong className="font-semibold">
+                                            {paragraph.split('. ')[0]}.
+                                        </strong>{' '}
+                                        {paragraph.includes('. ') ? paragraph.slice(paragraph.indexOf('. ') + 2) : ''}
+                                    </>
+                                ) : (
+                                    paragraph
+                                )}
+                            </p>
+                        ))}
+                    </section>
+
+                    <footer className="mt-8 flex items-center justify-between gap-4 border-t border-[var(--color-divider)] pt-5 text-[var(--color-text-muted)]">
+                        <div className="flex items-center gap-2 text-sm font-semibold">
+                            <Eye className="h-5 w-5" />
+                            <span>Preview</span>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <button
+                                type="button"
+                                className="transition hover:text-[var(--color-text-primary)]"
+                                aria-label="Share stack preview"
+                            >
+                                <Share2 className="h-5 w-5" />
+                            </button>
+                            <button
+                                type="button"
+                                className="flex items-center gap-1.5 transition hover:text-[var(--color-text-primary)]"
+                                aria-label="Saved count preview"
+                            >
+                                <Bookmark className="h-5 w-5" />
+                                <span className="text-sm font-semibold">Draft</span>
+                            </button>
+                        </div>
+                    </footer>
+                </article>
+            </div>
+        </div>
+    )
+}
+
+export default function StackCreate() {
+    const navigate = useNavigate()
+    const isCreator = localStorage.getItem('scs_role') === 'creator'
+    const [form, setForm] = useState(INITIAL_FORM)
+    const [message, setMessage] = useState('')
+
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+
+        try {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/stack/create`, form, {
+                withCredentials: true,
+            })
+
+            setMessage('Stack created successfully.')
+        } catch (error) {
+            console.log("error in sending stack data", error)
+            setMessage('Unable to create stack right now.')
+        }
+    }
+
+    const preview = useMemo(() => {
+        const title = form.title.trim() || 'Your next stack title'
+        const author = form.author.trim() || 'Your name'
+        const insightTitle = form.insightTitle.trim() || 'Your core insight'
+        const paragraphs = getPreviewParagraphs(form)
+
+        return {
+            title,
+            author,
+            cover: form.cover.trim() || DEFAULT_COVER,
+            insightTitle,
+            paragraphs: paragraphs.length
+                ? paragraphs
+                : [
+                    'Start by capturing the main lesson readers should remember after opening this stack.',
+                    'Use the second paragraph to explain why the idea matters and how it shows up in real life.',
+                    'Close with a sharp final thought, quote, or takeaway that leaves the stack feeling complete.',
+                ],
+        }
+    }, [form])
+
+    if (!isCreator) {
+        return (
+            <div className="flex min-h-[100dvh] items-center justify-center bg-[var(--color-bg)] px-6 py-10">
+                <div className="w-full max-w-md rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center shadow-[var(--shadow-card)]">
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+                        Creator access only
+                    </p>
+                    <h1 className="mt-3 text-2xl font-bold text-[var(--color-text-primary)]">
+                        Stack creation is available for creator accounts.
+                    </h1>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/stack')}
+                        className="mt-6 rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-[var(--color-text-on-primary)] transition hover:bg-[var(--color-primary-hover)]"
+                    >
+                        Back to stack
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    const handleChange = (event) => {
+        const { name, value } = event.target
+        setForm((current) => ({
+            ...current,
+            [name]: value,
+        }))
+        setMessage('')
+    }
+
+
+    return (
+        <div className="min-h-[100dvh] bg-[var(--color-bg)] px-4 py-4 text-[var(--color-text-primary)] md:px-6 md:py-6">
+            <div className="mx-auto max-w-7xl">
+                <div className="mb-5 ml-2 space-y-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-primary)]">
+                        Creator Studio
+                    </p>
+                    <h1 className="text-[26px] font-semibold tracking-[-0.02em] md:text-[32px]">
+                        Create Stack
+                    </h1>
+                    <p className="max-w-2xl text-sm text-[var(--color-text-secondary)]">
+                        Build the book cover, headline, and insight blocks together. The live preview mirrors the current stack detail presentation.
+                    </p>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+                    <section className="overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-card)] lg:sticky lg:top-6">
+                        <div className="border-b border-[var(--color-divider)] px-5 py-4 sm:px-6">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-primary)]">
+                                Stack Preview
+                            </p>
+                        </div>
+                        <StackDetailPreview stack={preview} />
+                    </section>
+
+                    <form
+                        onSubmit={handleSubmit}
+                        className="rounded-[32px] border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[var(--shadow-card)] sm:p-6 lg:min-h-[calc(100dvh-5rem)]"
+                    >
+                        <div className="flex items-center gap-2 text-[var(--color-primary)]">
+                            <BookOpenText className="h-4 w-4" />
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em]">
+                                Stack Details
+                            </p>
+                        </div>
+
+                        <div className="mt-6 grid gap-5 md:grid-cols-2">
+                            <FormField label="Book title">
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={form.title}
+                                    onChange={handleChange}
+                                    placeholder="Atomic Habits"
+                                    className="w-full rounded-2xl border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-4 py-3 text-sm outline-none transition focus:border-[var(--color-input-focus)] focus:ring-4 focus:ring-[var(--color-focus-ring)]"
+                                    required
+                                />
+                            </FormField>
+
+                            <FormField label="Author">
+                                <input
+                                    type="text"
+                                    name="author"
+                                    value={form.author}
+                                    onChange={handleChange}
+                                    placeholder="James Clear"
+                                    className="w-full rounded-2xl border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-4 py-3 text-sm outline-none transition focus:border-[var(--color-input-focus)] focus:ring-4 focus:ring-[var(--color-focus-ring)]"
+                                    required
+                                />
+                            </FormField>
+                        </div>
+
+                        <div className="mt-5">
+                            <FormField
+                                label="Cover image URL"
+                                hint="Paste a book cover image link to update the preview instantly."
+                            >
+                                <div className="relative">
+                                    <ImagePlus className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-muted)]" />
+                                    <input
+                                        type="url"
+                                        name="cover"
+                                        value={form.cover}
+                                        onChange={handleChange}
+                                        placeholder="https://example.com/book-cover.jpg"
+                                        className="w-full rounded-2xl border border-[var(--color-input-border)] bg-[var(--color-input-bg)] py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[var(--color-input-focus)] focus:ring-4 focus:ring-[var(--color-focus-ring)]"
+                                    />
+                                </div>
+                            </FormField>
+                        </div>
+
+                        <div className="mt-5">
+                            <FormField label="Insight headline">
+                                <input
+                                    type="text"
+                                    name="insightTitle"
+                                    value={form.insightTitle}
+                                    onChange={handleChange}
+                                    placeholder="Identity Drives Behavior"
+                                    className="w-full rounded-2xl border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-4 py-3 text-sm outline-none transition focus:border-[var(--color-input-focus)] focus:ring-4 focus:ring-[var(--color-focus-ring)]"
+                                    required
+                                />
+                            </FormField>
+                        </div>
+
+                        <div className="mt-5 space-y-5">
+                            <FormField
+                                label="Insight paragraph 1"
+                                hint="The first sentence is highlighted in the preview, just like the current stack detail page."
+                            >
+                                <textarea
+                                    name="insightOne"
+                                    value={form.insightOne}
+                                    onChange={handleChange}
+                                    rows="4"
+                                    placeholder="Lasting change gets easier when habits become evidence for the kind of person you believe you are."
+                                    className="w-full rounded-2xl border border-[var(--color-input-border)] bg-[var(--color-input-bg)] px-4 py-3 text-sm leading-7 outline-none transition focus:border-[var(--color-input-focus)] focus:ring-4 focus:ring-[var(--color-focus-ring)]"
+                                    required
+                                />
+                            </FormField>
+                  
+                        </div>
+
+                        <div className="mt-6 rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-xs)]">
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                    <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">
+                                        Ready to publish this stack?
+                                    </p>
+                                    <p className="mt-1 text-[13px] text-[var(--color-text-secondary)]">
+                                        The layout is in place. Submit can be connected once stack creation is supported in the API.
+                                    </p>
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="rounded-[18px] bg-[var(--color-primary)] px-6 py-3 text-[15px] font-semibold text-[var(--color-text-on-primary)] transition hover:bg-[var(--color-primary-hover)]"
+                                >
+                                    Create Stack
+                                </button>
+                            </div>
+
+                            {message ? (
+                                <p className="mt-4 text-[13px] font-medium text-[var(--color-text-secondary)]">
+                                    {message}
+                                </p>
+                            ) : null}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    )
+}

@@ -37,11 +37,6 @@ function BottomNav({ canCreate, onCreateClick }) {
                 ),
             },
             {
-                name: 'stack',
-                path: '/stack',
-                icon: () => <BookOpenText className="h-6 w-6" />,
-            },
-            {
                 name: 'profile',
                 path: profilePath,
                 icon: () => <User className="h-6 w-6" />,
