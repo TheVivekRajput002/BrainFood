@@ -11,7 +11,11 @@ const userBadgeSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "badge",
             required: true,
-        }
+        },
+        completedAt: {
+            type: Date,
+            default: Date.now,
+        },
     },
     {
         timestamps: true,

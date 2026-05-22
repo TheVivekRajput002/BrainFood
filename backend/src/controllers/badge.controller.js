@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const badgeModel = require("../models/badge.model")
-const userModel = require("../models/user.model")
 const userBadgeModel = require("../models/userBadge.model")
+const { awardBadge } = require("../services/achievement.service")
 
 function getErrorMessage(error) {
     if (error?.code === 11000) {
@@ -52,17 +52,7 @@ async function completeBadge(req, res) {
             })
         }
 
-        const userBadge = await userBadgeModel.create({
-            userId: user._id,
-            badgeId
-        })
-
-        const currentScore = Number(user.score) || 0
-        const pointsBonus = Number(badge.pointsBonus) || 0
-
-        await userModel.findByIdAndUpdate(user._id, {
-            $set: { score: currentScore + pointsBonus }
-        })
+        const userBadge = await awardBadge(user._id, badge)
 
         res.status(200).json({
             success: true,

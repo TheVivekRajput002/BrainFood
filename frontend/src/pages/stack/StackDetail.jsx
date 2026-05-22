@@ -37,6 +37,14 @@ export default function StackDetail() {
         })
             .then(response => {
                 setStack(response.data.stackDetail)
+
+                axios.post(
+                    `${import.meta.env.VITE_API_URL}/api/stack/${id}/read`,
+                    {},
+                    { withCredentials: true }
+                ).catch((readError) => {
+                    console.log("stack read tracking skipped", readError)
+                })
             })
             .catch(error => {
                 console.log("err in fetching stackDetail", error)

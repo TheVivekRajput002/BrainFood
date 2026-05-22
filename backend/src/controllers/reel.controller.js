@@ -3,6 +3,10 @@ const likeModel = require("../models/likes.model")
 const savedReelModel = require("../models/savedReel.model")
 const followModel = require("../models/follow.model")
 const { uploadFile, createVideoThumbnail } = require("../services/storage.service")
+const {
+    checkAchievements,
+    recordReelWatch,
+} = require("../services/achievement.service")
 const { v4: uuid } = require("uuid")
 
 async function createReel(req, res) {
@@ -120,6 +124,10 @@ async function saveReel(req, res) {
             $inc: { bookmarkCount: 1 }
         })
 
+        checkAchievements(user._id, "REEL_SAVED").catch((error) => {
+            console.error("[achievements] REEL_SAVED check failed:", error.message)
+        })
+
         res.status(201).json({
             message: "reel saved successfully",
             save
@@ -150,10 +158,33 @@ async function getSavedReels(req, res) {
     }
 }
 
+async function watchReel(req, res) {
+    try {
+        const { reelId } = req.params
+        const userId = req.user._id
+
+        await recordReelWatch(userId, reelId)
+
+        const unlocked = await checkAchievements(userId, "REEL_WATCHED")
+
+        res.status(200).json({
+            success: true,
+            unlockedBadges: unlocked.map((entry) => entry.badge),
+        })
+    } catch (error) {
+        console.error("error recording reel watch", error)
+        res.status(500).json({
+            success: false,
+            message: "something went wrong",
+        })
+    }
+}
+
 module.exports = {
     createReel,
     getReel,
     likeReel,
     saveReel,
-    getSavedReels
+    getSavedReels,
+    watchReel,
 }

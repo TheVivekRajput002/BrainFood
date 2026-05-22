@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Award, CheckCircle2, Crown, Lock, Medal, Sparkles, Trophy } from 'lucide-react'
-import { useToast } from '../context/ToastContext'
 import {
     BADGE_TIERS,
     TIER_LABELS,
@@ -36,10 +35,9 @@ const TIER_STYLES = {
     },
 }
 
-function BadgeCard({ badge, onCompleteBadge, completingId }) {
+function BadgeCard({ badge }) {
     const tierStyle = TIER_STYLES[badge.tier]
     const TierIcon = tierStyle.icon
-    const isCompleting = completingId === badge.id
 
     return (
         <article
@@ -90,23 +88,13 @@ function BadgeCard({ badge, onCompleteBadge, completingId }) {
                     <p className="mt-3 text-xs font-semibold text-[var(--color-primary)]">
                         +{badge.pointsBonus} bonus points
                     </p>
-                    {!badge.completed && onCompleteBadge && (
-                        <button
-                            type="button"
-                            onClick={() => onCompleteBadge(badge.id)}
-                            disabled={isCompleting}
-                            className="mt-3 rounded-full border border-[var(--color-primary)] bg-[var(--color-primary-soft)] px-3 py-1 text-[0.7rem] font-semibold text-[var(--color-primary)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            {isCompleting ? 'Saving...' : 'Mark complete'}
-                        </button>
-                    )}
                 </div>
             </div>
         </article>
     )
 }
 
-function TierSection({ tier, badges, onCompleteBadge, completingId }) {
+function TierSection({ tier, badges }) {
     if (!badges.length) return null
 
     const tierStyle = TIER_STYLES[tier]
@@ -135,12 +123,7 @@ function TierSection({ tier, badges, onCompleteBadge, completingId }) {
 
             <div className="grid gap-4 md:grid-cols-2">
                 {badges.map((badge) => (
-                    <BadgeCard
-                        key={badge.id}
-                        badge={badge}
-                        onCompleteBadge={onCompleteBadge}
-                        completingId={completingId}
-                    />
+                    <BadgeCard key={badge.id} badge={badge} />
                 ))}
             </div>
         </section>
@@ -148,54 +131,9 @@ function TierSection({ tier, badges, onCompleteBadge, completingId }) {
 }
 
 export default function Achievements() {
-    const { showToast } = useToast()
     const [badges, setBadges] = useState([])
     const [loading, setLoading] = useState(true)
     const [loadError, setLoadError] = useState('')
-    const [completingId, setCompletingId] = useState('')
-    const [completeError, setCompleteError] = useState('')
-
-    async function handleCompleteBadge(badgeId) {
-        const completedBadge = badges.find((badge) => badge.id === badgeId)
-
-        setCompletingId(badgeId)
-        setCompleteError('')
-
-        try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/badge/${badgeId}/completeBadge`,
-                {},
-                { withCredentials: true }
-            )
-
-            if (!response.data?.success) {
-                setCompleteError(response.data?.message || 'Unable to complete badge.')
-                return
-            }
-
-            setBadges((currentBadges) =>
-                currentBadges.map((badge) =>
-                    badge.id === badgeId ? { ...badge, completed: true } : badge
-                )
-            )
-
-            if (completedBadge && response.data?.message !== 'Badge already completed') {
-                showToast(
-                    `Achievement unlocked: ${completedBadge.name}! +${completedBadge.pointsBonus} bonus points`,
-                    'success'
-                )
-            }
-        } catch (error) {
-            const message =
-                error.response?.data?.message ||
-                error.response?.data?.error?.message ||
-                'Unable to complete badge. Make sure you are logged in as a user account.'
-            setCompleteError(message)
-            console.log('error completing badge', error)
-        } finally {
-            setCompletingId('')
-        }
-    }
 
     useEffect(() => {
         axios
@@ -310,15 +248,6 @@ export default function Achievements() {
                     </div>
                 </header>
 
-                {completeError && (
-                    <p
-                        role="alert"
-                        className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm text-[var(--color-text-secondary)]"
-                    >
-                        {completeError}
-                    </p>
-                )}
-
                 {completedBadges.length > 0 && (
                     <section className="mt-10">
                         <div className="mb-4 flex items-center gap-2">
@@ -327,12 +256,7 @@ export default function Achievements() {
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2">
                             {completedBadges.map((badge) => (
-                                <BadgeCard
-                                    key={`completed-${badge.id}`}
-                                    badge={badge}
-                                    onCompleteBadge={handleCompleteBadge}
-                                    completingId={completingId}
-                                />
+                                <BadgeCard key={`completed-${badge.id}`} badge={badge} />
                             ))}
                         </div>
                     </section>
@@ -340,13 +264,7 @@ export default function Achievements() {
 
                 <div className="mt-10 space-y-8">
                     {BADGE_TIERS.map((tier) => (
-                        <TierSection
-                            key={tier}
-                            tier={tier}
-                            badges={badgesByTier[tier]}
-                            onCompleteBadge={handleCompleteBadge}
-                            completingId={completingId}
-                        />
+                        <TierSection key={tier} tier={tier} badges={badgesByTier[tier]} />
                     ))}
                 </div>
             </div>

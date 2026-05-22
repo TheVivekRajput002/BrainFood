@@ -1,5 +1,6 @@
 const userModel = require("../models/user.model")
 const { uploadFile } = require("../services/storage.service")
+const { checkAchievements } = require("../services/achievement.service")
 const { v4: uuid } = require("uuid")
 
 function getUserProfile(req, res) {
@@ -16,9 +17,16 @@ async function updateUserProfile(req, res) {
 
     await userModel.findByIdAndUpdate(
         user._id,
-        { profile_picture: uploadFileResult.url },
+        {
+            profile_picture: uploadFileResult.url,
+            $inc: { profileUpdateCount: 1 },
+        },
         { new: true }
     )
+
+    checkAchievements(user._id, "PROFILE_UPDATED").catch((error) => {
+        console.error("[achievements] PROFILE_UPDATED check failed:", error.message)
+    })
 
     res.status(201).json({
         message: "profile picture updated succesfully",
@@ -31,9 +39,16 @@ async function updateUserBio(req, res) {
 
     await userModel.findByIdAndUpdate(
         user._id,
-        { bio: bio },
+        {
+            bio: bio,
+            $inc: { profileUpdateCount: 1 },
+        },
         { new: true }
     )
+
+    checkAchievements(user._id, "PROFILE_UPDATED").catch((error) => {
+        console.error("[achievements] PROFILE_UPDATED check failed:", error.message)
+    })
 
     res.status(201).json({
         success:true,

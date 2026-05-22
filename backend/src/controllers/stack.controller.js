@@ -1,5 +1,9 @@
 const stackModel = require("../models/stack.model")
 const cardModel = require("../models/card.model")
+const {
+    checkAchievements,
+    recordStackRead,
+} = require("../services/achievement.service")
 
 async function createStack(req, res) {
     const creator = req.creator
@@ -92,8 +96,39 @@ async function getStackDetail(req, res) {
     }
 }
 
+async function markStackRead(req, res) {
+    try {
+        const stackId = req.params.id
+        const userId = req.user._id
+
+        const stack = await stackModel.findById(stackId)
+
+        if (!stack) {
+            return res.status(404).json({
+                success: false,
+                message: "Stack not found",
+            })
+        }
+
+        await recordStackRead(userId, stackId)
+
+        const unlocked = await checkAchievements(userId, "STACK_READ")
+
+        res.status(200).json({
+            success: true,
+            unlockedBadges: unlocked.map((entry) => entry.badge),
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            error: error.message,
+        })
+    }
+}
+
 module.exports = {
     createStack,
     getStacks,
-    getStackDetail
+    getStackDetail,
+    markStackRead,
 }

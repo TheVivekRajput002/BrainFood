@@ -24,7 +24,7 @@ async function uploadFile(file, fileName) {
 }
 
 async function createVideoThumbnail(fileBuffer, fileName, options = {}) {
-    const { startOffset = 1, width = 400, height = 400 } = options
+    const { startOffset = 3, width = 1280, height = 720 } = options
     const sourcePath = path.join(tempDirectory, `${fileName}.mp4`)
     const thumbnailPath = path.join(tempDirectory, `${fileName}.jpg`)
 
@@ -41,7 +41,9 @@ async function createVideoThumbnail(fileBuffer, fileName, options = {}) {
             "-frames:v",
             "1",
             "-vf",
-            `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height}`,
+            `scale=${width}:${height}:force_original_aspect_ratio=increase:flags=lanczos,crop=${width}:${height}`,
+            "-q:v",
+            "2",
             thumbnailPath,
         ])
 
@@ -53,7 +55,6 @@ async function createVideoThumbnail(fileBuffer, fileName, options = {}) {
         ])
     }
 }
-
 
 module.exports = {
     uploadFile,

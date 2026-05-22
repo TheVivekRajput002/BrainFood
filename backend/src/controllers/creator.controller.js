@@ -3,6 +3,7 @@ const userModel = require('../models/user.model')
 const reelModel = require("../models/reel.model")
 const followModel = require("../models/follow.model")
 const { uploadFile } = require("../services/storage.service")
+const { checkAchievements } = require("../services/achievement.service")
 const { v4: uuid } = require("uuid")
 
 async function getCreatorById(req, res) {
@@ -54,6 +55,11 @@ async function followCreator(req, res) {
         await followModel.create({ user: userId, creator: creatorId });
         await userModel.findByIdAndUpdate(userId, { $inc: { followingCount: +1 } })
         await creatorModel.findByIdAndUpdate(creatorId, { $inc: { followersCount: +1 } })
+
+        checkAchievements(userId, "USER_FOLLOWED").catch((error) => {
+            console.error("[achievements] USER_FOLLOWED check failed:", error.message)
+        })
+
         return res.json({ success: true, action: "followed" });
     }
 }

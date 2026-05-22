@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
+import { Play } from 'lucide-react'
 import {
     buildInitialFollowState,
     toggleFollowCreator,
@@ -37,6 +38,7 @@ function HomeReels() {
     const [saved, setSaved] = useState({})
     const [isFollowing, setIsFollowing] = useState({})
     const [mutedReels, setMutedReels] = useState({})
+    const [pausedReels, setPausedReels] = useState({})
     const [activeReelId, setActiveReelId] = useState(null)
     const [loading, setLoading] = useState(true)
     const [loadError, setLoadError] = useState('')
@@ -48,7 +50,7 @@ function HomeReels() {
             .then(response => {
                 const reels = response.data.reel || []
                 setVideos(reels)
-                setActiveReelId(reels[0]?._id || null)
+                setActiveReelId(reels[0]?._id ? String(reels[0]._id) : null)
                 setIsFollowing(buildInitialFollowState(reels))
                 setLiked(buildInitialLikedState(reels))
                 setSaved(buildInitialSavedState(reels))
@@ -88,7 +90,7 @@ function HomeReels() {
                     const nextActiveReelId = visibleEntries[0].target.dataset.reelId
 
                     if (nextActiveReelId) {
-                        setActiveReelId(nextActiveReelId)
+                        setActiveReelId(String(nextActiveReelId))
                     }
                 }
             },
@@ -107,6 +109,20 @@ function HomeReels() {
     }, [videos])
 
     useEffect(() => {
+        if (!activeReelId) {
+            return
+        }
+
+        axios.post(
+            `${import.meta.env.VITE_API_URL}/api/reel/${activeReelId}/watch`,
+            {},
+            { withCredentials: true }
+        ).catch((error) => {
+            console.log("reel watch tracking skipped", error)
+        })
+    }, [activeReelId])
+
+    useEffect(() => {
         videos.forEach((reel) => {
             const videoElement = videoRefs.current[reel._id]
 
@@ -114,10 +130,16 @@ function HomeReels() {
                 return
             }
 
-            const isActiveReel = reel._id === activeReelId
+            const reelId = String(reel._id)
+            const isActiveReel = reelId === String(activeReelId)
             videoElement.muted = mutedReels[reel._id] === true
 
             if (isActiveReel) {
+                if (pausedReels[reelId]) {
+                    videoElement.pause()
+                    return
+                }
+
                 const playPromise = videoElement.play()
 
                 if (playPromise?.catch) {
@@ -130,7 +152,7 @@ function HomeReels() {
             videoElement.pause()
             videoElement.currentTime = 0
         })
-    }, [activeReelId, mutedReels, videos])
+    }, [activeReelId, mutedReels, pausedReels, videos])
 
     useEffect(() => {
         const currentVideoRefs = videoRefs.current
@@ -194,6 +216,38 @@ function HomeReels() {
         }))
     }
 
+    const handleReelTogglePlay = (reelId) => {
+        const reelKey = String(reelId)
+
+        if (reelKey !== String(activeReelId)) {
+            return
+        }
+
+        const videoElement = videoRefs.current[reelId] || videoRefs.current[reelKey]
+
+        if (!videoElement) {
+            return
+        }
+
+        const willPause = !videoElement.paused
+
+        setPausedReels((prev) => ({
+            ...prev,
+            [reelKey]: willPause,
+        }))
+
+        if (willPause) {
+            videoElement.pause()
+            return
+        }
+
+        const playPromise = videoElement.play()
+
+        if (playPromise?.catch) {
+            playPromise.catch(() => {})
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex h-[calc(100dvh-60px)] w-full items-center justify-center bg-[var(--color-bg)] px-6 text-center text-[var(--color-text-secondary)] md:h-full">
@@ -236,6 +290,9 @@ function HomeReels() {
                     avatar: reel.creatorAvatar || reel?.creator?.profile_picture || "https://i.pravatar.cc/96?img=12",
                     caption: reel.caption || "Fresh food reel",
                 }
+                const reelId = String(reel._id)
+                const isActiveReel = reelId === String(activeReelId)
+                const isPaused = !!pausedReels[reelId]
 
                 return (
                     <div
@@ -271,8 +328,28 @@ function HomeReels() {
                                     preload="metadata"
                                 />
 
-                                <div className="absolute inset-0 bg-[var(--gradient-reel-overlay)]" />
-                                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/65 via-black/20 to-transparent md:hidden" />
+                                <button
+                                    type="button"
+                                    aria-label={isPaused ? 'Play reel' : 'Pause reel'}
+                                    className="absolute inset-0 z-[12] cursor-pointer border-0 bg-transparent p-0"
+                                    onClick={() => handleReelTogglePlay(reel._id)}
+                                />
+
+                                {isActiveReel && isPaused && (
+                                    <div
+                                        className="pointer-events-none absolute inset-0 z-[14] flex items-center justify-center"
+                                        aria-hidden
+                                    >
+                                        <Play
+                                            className="h-20 w-20 fill-white text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
+                                            strokeWidth={0}
+                                            aria-hidden
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="pointer-events-none absolute inset-0 bg-[var(--gradient-reel-overlay)]" />
+                                <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/65 via-black/20 to-transparent md:hidden" />
 
                                 <div className="absolute inset-x-0 top-0 z-20 flex items-center px-4 pt-4 md:hidden">
                                     <div className="flex items-center gap-1.5">
@@ -433,6 +510,23 @@ function HomeReels() {
                                     </div>
                                     <span className="text-xs font-medium text-white/90 md:text-sm">{reel.likeCount || 0}</span>
                                 </button>
+                                <button className="flex flex-col items-center gap-1 group">
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--color-backdrop)] backdrop-blur-sm transition-all group-active:scale-90 group-hover:bg-[color:var(--color-scrim)]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-xs font-medium text-white/90 md:text-sm">{reel.comments || 0}</span>
+                                </button>
+
+                                <button className="flex flex-col items-center gap-1 group">
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--color-backdrop)] backdrop-blur-sm transition-all group-active:scale-90 group-hover:bg-[color:var(--color-scrim)]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25 3.75 12m0 0 3.75 3.75M3.75 12h11.5a4.75 4.75 0 0 1 0 9.5H14.25" />
+                                    </svg>
+                                    </div>
+                                    <span className="text-xs font-medium text-white/90 md:text-sm">Share</span>
+                                </button>
 
                                 <button
                                     onClick={() => handleSaveClick(reel)}
@@ -446,22 +540,6 @@ function HomeReels() {
                                     <span className="text-xs font-medium text-white/90 md:text-sm">{reel.bookmarkCount || 0}</span>
                                 </button>
 
-                                <button className="flex flex-col items-center gap-1 group">
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--color-backdrop)] backdrop-blur-sm transition-all group-active:scale-90 group-hover:bg-[color:var(--color-scrim)]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-xs font-medium text-white/90 md:text-sm">{reel.comments || 0}</span>
-                                </button>
-
-                                <button className="flex flex-col items-center gap-1 group">
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--color-backdrop)] backdrop-blur-sm transition-all group-active:scale-90 group-hover:bg-[color:var(--color-scrim)]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                                        </svg>
-                                    </div>
-                                </button>
 
                                 <button className="flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--color-backdrop)] text-3xl leading-none text-white">...</button>
                             </div>

@@ -44,7 +44,11 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0,
         required: true
-    }
+    },
+    profileUpdateCount: {
+        type: Number,
+        default: 0,
+    },
 },
     {
         timestamps: true

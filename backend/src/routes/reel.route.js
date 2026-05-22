@@ -13,6 +13,7 @@ router.post("/", authMiddleware.authCreatorMiddleware, upload.single("video"), r
 router.get("/", authMiddleware.authUserMiddleware, reelController.getReel)
 router.post("/like", authMiddleware.authUserMiddleware, reelController.likeReel)
 router.post("/:reelId/save", authMiddleware.authUserMiddleware, reelController.saveReel)
+router.post("/:reelId/watch", authMiddleware.authUserMiddleware, reelController.watchReel)
 router.get("/savedReels", authMiddleware.authUserMiddleware, reelController.getSavedReels)
 
 
