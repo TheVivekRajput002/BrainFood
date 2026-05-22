@@ -22,7 +22,7 @@ export function ToastProvider({ children }) {
     const showToast = useCallback((message, type = 'success') => {
         const id = crypto.randomUUID()
 
-        setToasts((current) => [...current, { id, message, type }])
+        setToasts([{ id, message, type }])
 
         const timer = setTimeout(() => {
             removeToast(id)

@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import axios from 'axios'
 import { Lock, Mail, Sparkles, User, UserRound } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
+import { getGoogleAuthHref } from '../../utils/googleAuth'
 
 function SocialGoogleIcon() {
     return (
@@ -49,8 +50,31 @@ function AuthField({ id, name, type, placeholder, icon: Icon, autoComplete, requ
 
 function UserRegister() {
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
     const { showToast } = useToast()
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const oauthHandledRef = useRef(false)
+    const googleAuthHref = getGoogleAuthHref('register')
+
+    useEffect(() => {
+        if (oauthHandledRef.current) return
+
+        if (searchParams.get('oauth') === 'success') {
+            oauthHandledRef.current = true
+            localStorage.setItem('scs_auth', 'true')
+            localStorage.setItem('scs_role', 'user')
+            setSearchParams({}, { replace: true })
+            navigate('/user/profile', { replace: true })
+            return
+        }
+
+        const oauthError = searchParams.get('oauth_error')
+        if (oauthError) {
+            oauthHandledRef.current = true
+            showToast(decodeURIComponent(oauthError), 'error')
+            setSearchParams({}, { replace: true })
+        }
+    }, [searchParams, setSearchParams, navigate, showToast])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -86,8 +110,8 @@ function UserRegister() {
         }
     }
 
-    const handleSocialClick = () => {
-        showToast('Social sign-up is not available yet.', 'info')
+    const handleGitHubClick = () => {
+        showToast('GitHub sign-up is not available yet.', 'info')
     }
 
     return (
@@ -132,17 +156,16 @@ function UserRegister() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-3">
-                    <button
-                        type="button"
-                        onClick={handleSocialClick}
-                        className="flex justify-center items-center py-2 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors shadow-sm"
+                    <a
+                        href={googleAuthHref}
+                        className="flex justify-center items-center py-2 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors shadow-sm no-underline"
                         aria-label="Sign up with Google"
                     >
                         <SocialGoogleIcon />
-                    </button>
+                    </a>
                     <button
                         type="button"
-                        onClick={handleSocialClick}
+                        onClick={handleGitHubClick}
                         className="flex justify-center items-center py-2 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors shadow-sm text-slate-900"
                         aria-label="Sign up with GitHub"
                     >

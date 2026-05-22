@@ -2,6 +2,7 @@ const express = require("express")
 const cookieParser = require("cookie-parser")
 require('dotenv').config();
 const authRoutes = require("./routes/auth.route")
+const oauthRoutes = require("./routes/oauth.router")
 const stackRoutes = require("./routes/stack.route")
 const userRoutes = require("./routes/user.route")
 const reelRoutes = require("./routes/reel.route")
@@ -49,6 +50,9 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authLimiter)
 app.use("/api/auth", authRoutes)
+app.use("/api/auth", oauthRoutes)
+// Legacy OAuth paths (e.g. GOOGLE_REDIRECT_URI=.../auth/callback)
+app.use("/auth", authLimiter, oauthRoutes)
 app.use("/api/user", userRoutes)
 app.use("/api/reel", reelRoutes)
 app.use("/api/stack", stackRoutes)

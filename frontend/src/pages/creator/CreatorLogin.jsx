@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Eye, EyeOff, Sparkles } from 'lucide-react'
 import { useToast } from '../../context/ToastContext'
+import { getGoogleAuthHref } from '../../utils/googleAuth'
 
 function SocialGoogleIcon() {
     return (
@@ -60,8 +61,10 @@ function CreatorLogin() {
         }
     }
 
-    const handleSocialClick = () => {
-        showToast('Social sign-in is not available yet.', 'info')
+    const googleAuthHref = getGoogleAuthHref('login')
+
+    const handleGitHubClick = () => {
+        showToast('GitHub sign-in is not available yet.', 'info')
     }
 
     return (
@@ -160,17 +163,16 @@ function CreatorLogin() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mb-2">
-                        <button
-                            type="button"
-                            onClick={handleSocialClick}
-                            className="flex justify-center items-center py-2 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors shadow-sm"
+                        <a
+                            href={googleAuthHref}
+                            className="flex justify-center items-center py-2 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors shadow-sm no-underline"
                             aria-label="Sign in with Google"
                         >
                             <SocialGoogleIcon />
-                        </button>
+                        </a>
                         <button
                             type="button"
-                            onClick={handleSocialClick}
+                            onClick={handleGitHubClick}
                             className="flex justify-center items-center py-2 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors shadow-sm text-slate-900"
                             aria-label="Sign in with GitHub"
                         >
