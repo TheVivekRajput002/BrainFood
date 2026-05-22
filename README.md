@@ -120,6 +120,8 @@ Keep `http://localhost:3000/auth/callback` if you still test locally.
 
 **Redeploy** the frontend after changing `VITE_API_URL` (Vite bakes it in at build time).
 
+**Vercel 404 on `/user/login` or other routes:** React Router paths only exist in the browser. Add `frontend/vercel.json` (included in this repo) so Vercel serves `index.html` for all routes, then redeploy. In the Vercel project settings, set **Root Directory** to `frontend` if you deploy the monorepo.
+
 ### 4) Quick check
 
 - Google button should open: `https://YOUR-BACKEND/.../api/auth/google` (or `/auth/google` depending on mount).
