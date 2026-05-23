@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 import { Play } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
 import { showUnlockedBadges } from '../utils/badgeToasts'
@@ -441,14 +442,33 @@ function HomeReels() {
                                 <div className="pointer-events-none absolute bottom-2 left-1 right-0 z-20 flex items-end justify-between gap-3 px-3 md:hidden">
                                     <div className="min-w-0 flex-1 pr-2">
                                         <div className="mb-3 flex items-center gap-3">
-                                            <img
-                                                src={creator.avatar}
-                                                alt={creator.name}
-                                                className="pointer-events-none h-10 w-10 rounded-full border border-white/35 object-cover"
-                                            />
-                                            <p className="pointer-events-none truncate text-[15px] font-semibold text-white">
-                                                {creator.name}
-                                            </p>
+                                            {creatorId ? (
+                                                <Link
+                                                    to={`/creator/${creatorId}`}
+                                                    onClick={(event) => event.stopPropagation()}
+                                                    className="pointer-events-auto flex min-w-0 items-center gap-3"
+                                                >
+                                                    <img
+                                                        src={creator.avatar}
+                                                        alt={creator.name}
+                                                        className="h-10 w-10 shrink-0 rounded-full border border-white/35 object-cover"
+                                                    />
+                                                    <p className="truncate text-[15px] font-semibold text-white">
+                                                        {creator.name}
+                                                    </p>
+                                                </Link>
+                                            ) : (
+                                                <>
+                                                    <img
+                                                        src={creator.avatar}
+                                                        alt={creator.name}
+                                                        className="pointer-events-none h-10 w-10 rounded-full border border-white/35 object-cover"
+                                                    />
+                                                    <p className="pointer-events-none truncate text-[15px] font-semibold text-white">
+                                                        {creator.name}
+                                                    </p>
+                                                </>
+                                            )}
 
                                             <button
                                                 type="button"
@@ -539,14 +559,33 @@ function HomeReels() {
 
                                 <div className="pointer-events-none absolute bottom-16 left-2 right-2 z-20 hidden md:block md:bottom-1 md:left-4 md:right-4">
                                     <div className="flex items-center gap-3">
-                                        <img
-                                            src={creator.avatar}
-                                            alt={creator.name}
-                                            className="pointer-events-none h-9 w-9 rounded-full object-cover"
-                                        />
-                                        <p className="pointer-events-none truncate text-sm font-semibold leading-tight text-white">
-                                            {creator.name}
-                                        </p>
+                                        {creatorId ? (
+                                            <Link
+                                                to={`/creator/${creatorId}`}
+                                                onClick={(event) => event.stopPropagation()}
+                                                className="pointer-events-auto flex min-w-0 items-center gap-3"
+                                            >
+                                                <img
+                                                    src={creator.avatar}
+                                                    alt={creator.name}
+                                                    className="h-9 w-9 shrink-0 rounded-full object-cover"
+                                                />
+                                                <p className="truncate text-sm font-semibold leading-tight text-white">
+                                                    {creator.name}
+                                                </p>
+                                            </Link>
+                                        ) : (
+                                            <>
+                                                <img
+                                                    src={creator.avatar}
+                                                    alt={creator.name}
+                                                    className="pointer-events-none h-9 w-9 rounded-full object-cover"
+                                                />
+                                                <p className="pointer-events-none truncate text-sm font-semibold leading-tight text-white">
+                                                    {creator.name}
+                                                </p>
+                                            </>
+                                        )}
 
                                         <button
                                             type="button"

@@ -9,8 +9,8 @@ const upload = multer({
 
 const router = express.Router()
 
-router.post("/:id/follow",authMiddleware.authUserMiddleware,  creatorController.followCreator  )
-
-router.get("/profile",authMiddleware.authCreatorMiddleware, creatorController.getCreatorProfile  )
+router.get("/profile", authMiddleware.authCreatorMiddleware, creatorController.getCreatorProfile)
+router.get("/:id", creatorController.getCreatorById)
+router.post("/:id/follow", authMiddleware.authUserMiddleware, creatorController.followCreator)
 router.post('/profile-picture', authMiddleware.authCreatorMiddleware, upload.single("image"), creatorController.updateCreatorProfile)
 module.exports = router;

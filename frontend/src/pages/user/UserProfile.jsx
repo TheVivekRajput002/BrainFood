@@ -360,7 +360,7 @@ function UserProfile() {
                     </div>
 
                     {activeTab === PROFILE_TABS.saved && (
-                        <div className="grid grid-cols-3 gap-[1px] bg-[var(--color-border)]">
+                        <div className="grid grid-cols-3 gap-[1px] bg-[var(--color-bg)]">
                             {savedReels.map((item) => (
                                 <button
                                     key={item._id}
