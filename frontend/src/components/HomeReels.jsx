@@ -340,7 +340,7 @@ function HomeReels() {
                                 <button
                                     type="button"
                                     aria-label={isPaused ? 'Play reel' : 'Pause reel'}
-                                    className="absolute inset-0 z-[12] cursor-pointer border-0 bg-transparent p-0"
+                                    className="absolute inset-0 z-[15] cursor-pointer border-0 bg-transparent p-0"
                                     onClick={() => handleReelTogglePlay(reel._id)}
                                 />
 
@@ -360,7 +360,7 @@ function HomeReels() {
                                 <div className="pointer-events-none absolute inset-0 bg-[var(--gradient-reel-overlay)]" />
                                 <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/65 via-black/20 to-transparent md:hidden" />
 
-                                <div className="absolute inset-x-0 top-0 z-20 flex items-center px-4 pt-4 md:hidden">
+                                <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center px-4 pt-4 md:hidden">
                                     <div className="flex items-center gap-1.5">
                                         <h2 className="text-lg font-semibold tracking-tight text-white">Reels</h2>
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white/90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -369,15 +369,15 @@ function HomeReels() {
                                     </div>
                                 </div>
 
-                                <div className="absolute bottom-2 left-1 right-0 z-20 flex items-end justify-between gap-3 px-3 md:hidden">
+                                <div className="pointer-events-none absolute bottom-2 left-1 right-0 z-20 flex items-end justify-between gap-3 px-3 md:hidden">
                                     <div className="min-w-0 flex-1 pr-2">
                                         <div className="mb-3 flex items-center gap-3">
                                             <img
                                                 src={creator.avatar}
                                                 alt={creator.name}
-                                                className="h-10 w-10 rounded-full border border-white/35 object-cover"
+                                                className="pointer-events-none h-10 w-10 rounded-full border border-white/35 object-cover"
                                             />
-                                            <p className="truncate text-[15px] font-semibold text-white">
+                                            <p className="pointer-events-none truncate text-[15px] font-semibold text-white">
                                                 {creator.name}
                                             </p>
 
@@ -387,7 +387,7 @@ function HomeReels() {
                                                     event.stopPropagation()
                                                     handleFollow(creatorId)
                                                 }}
-                                                className={`relative z-20 h-8 min-w-[78px] rounded-lg border px-3 text-xs font-semibold transition-all ${followed
+                                                className={`pointer-events-auto relative z-20 h-8 min-w-[78px] rounded-lg border px-3 text-xs font-semibold transition-all ${followed
                                                     ? "border-white bg-white text-black"
                                                     : "border-white/70 bg-transparent text-white backdrop-blur-sm"
                                                     }`}
@@ -396,14 +396,15 @@ function HomeReels() {
                                             </button>
                                         </div>
 
-                                        <p className="mb-3 line-clamp-2 text-sm leading-5 text-white drop-shadow-lg">
+                                        <p className="pointer-events-none mb-3 line-clamp-2 text-sm leading-5 text-white drop-shadow-lg">
                                             {reel.description}
                                             {/* <span className="text-white/80"> more</span> */}
                                         </p>
                                     </div>
 
-                                    <div className="flex w-10 flex-col items-center justify-end gap-4">
+                                    <div className="pointer-events-auto flex w-10 flex-col items-center justify-end gap-4">
                                         <button
+                                            type="button"
                                             onClick={() => handleLikeClick(reel)}
                                             className="flex flex-col items-center gap-1"
                                         >
@@ -413,14 +414,14 @@ function HomeReels() {
                                             <span className="text-[11px] font-medium text-white">{formatCount(reel.likeCount)}</span>
                                         </button>
 
-                                        <button className="flex flex-col items-center gap-1">
+                                        <button type="button" className="flex flex-col items-center gap-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
                                             </svg>
                                             <span className="text-[11px] font-medium text-white">{formatCount(reel.comments)}</span>
                                         </button>
 
-                                        <button className="flex flex-col items-center gap-1">
+                                        <button type="button" className="flex flex-col items-center gap-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 -scale-x-100 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25 3.75 12m0 0 3.75 3.75M3.75 12h11.5a4.75 4.75 0 0 1 0 9.5H14.25" />
                                             </svg>
@@ -428,6 +429,7 @@ function HomeReels() {
                                         </button>
 
                                         <button
+                                            type="button"
                                             onClick={() => handleSaveClick(reel)}
                                             className="flex flex-col items-center gap-1"
                                         >
@@ -460,14 +462,14 @@ function HomeReels() {
                                     </div>
                                 </div>
 
-                                <div className="absolute bottom-16 left-2 right-2 z-20 hidden md:block md:bottom-1 md:left-4 md:right-4">
+                                <div className="pointer-events-none absolute bottom-16 left-2 right-2 z-20 hidden md:block md:bottom-1 md:left-4 md:right-4">
                                     <div className="flex items-center gap-3">
                                         <img
                                             src={creator.avatar}
                                             alt={creator.name}
-                                            className="h-9 w-9 rounded-full object-cover"
+                                            className="pointer-events-none h-9 w-9 rounded-full object-cover"
                                         />
-                                        <p className="truncate text-sm font-semibold leading-tight text-white">
+                                        <p className="pointer-events-none truncate text-sm font-semibold leading-tight text-white">
                                             {creator.name}
                                         </p>
 
@@ -477,7 +479,7 @@ function HomeReels() {
                                                 event.stopPropagation()
                                                 handleFollow(creatorId)
                                             }}
-                                            className={`relative z-20 h-8 min-w-[40px] rounded-2xl border px-3 text-[11px] leading-none transition-all ${followed
+                                            className={`pointer-events-auto relative z-20 h-8 min-w-[40px] rounded-2xl border px-3 text-[11px] leading-none transition-all ${followed
                                                 ? "border-white bg-white text-black"
                                                 : "border-white/75 bg-white/10 text-white backdrop-blur-sm"
                                                 }`}
@@ -487,7 +489,7 @@ function HomeReels() {
                                     </div>
 
                                     <div className="-mt-1 flex items-center justify-between gap-3">
-                                        <p className="line-clamp-1 text-sm text-white drop-shadow-lg">
+                                        <p className="pointer-events-none line-clamp-1 text-sm text-white drop-shadow-lg">
                                             {creator.caption}
                                             <span className="text-white/80"> ... more</span>
                                         </p>
@@ -495,7 +497,7 @@ function HomeReels() {
                                             type="button"
                                             onClick={() => handleMuteToggle(reel._id)}
                                             aria-label={mutedReels[reel._id] === true ? "Unmute reel" : "Mute reel"}
-                                            className="mb-3 flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--color-divider)] bg-[color:var(--color-backdrop)] text-white"
+                                            className="pointer-events-auto mb-3 flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--color-divider)] bg-[color:var(--color-backdrop)] text-white"
                                         >
                                             {mutedReels[reel._id] === true ? (
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.9}>
