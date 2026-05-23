@@ -1,4 +1,4 @@
-import { Bookmark, Eye, Headphones, PenLine, Share2 } from 'lucide-react'
+import { ArrowLeft, Bookmark, Eye, Headphones, PenLine, Share2 } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getStackById } from './stackData'
 import axios from "axios"
@@ -101,7 +101,18 @@ export default function StackDetail() {
 
     return (
         <div className="min-h-[100dvh] bg-[var(--color-bg)] text-[var(--color-text-primary)]">
-            <div className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-8 sm:px-6 sm:py-10">
+            <div className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-6 sm:px-6 sm:py-10">
+                <div className="mb-4 flex w-full max-w-xl justify-start">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/stack')}
+                        className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-2 text-sm font-semibold text-[var(--color-text-secondary)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                    >
+                        <ArrowLeft className="h-4 w-4" aria-hidden />
+                        Back to stacks
+                    </button>
+                </div>
+
                 <header className="w-full max-w-xl text-center">
                     <div className="flex justify-center">
                         <BookCover
@@ -135,8 +146,11 @@ export default function StackDetail() {
 
                 <div className="mt-10 w-full max-w-xl flex flex-col gap-4">
                     {
-                        (stack.cards ?? []).map(card => (
-                            <article className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-md)] sm:p-8">
+                        (stack.cards ?? []).map((card, cardIndex) => (
+                            <article
+                                key={card._id || card.id || `card-${cardIndex}`}
+                                className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-md)] sm:p-8"
+                            >
                                 <header>
                                     <h2 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
                                         {card.head}

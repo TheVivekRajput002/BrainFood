@@ -297,7 +297,7 @@ function HomeReels() {
                 const creator = {
                     name: reel.creatorName || reel?.creator?.name || "Creator",
                     avatar: reel.creatorAvatar || reel?.creator?.profile_picture || "https://i.pravatar.cc/96?img=12",
-                    caption: reel.caption || "Fresh food reel",
+                    caption: reel.caption || reel.description || "Fresh food reel",
                 }
                 const reelId = String(reel._id)
                 const isActiveReel = reelId === String(activeReelId)
@@ -383,8 +383,11 @@ function HomeReels() {
 
                                             <button
                                                 type="button"
-                                                onClick={() => handleFollow(creatorId)}
-                                                className={`h-8 min-w-[78px] rounded-lg border px-3 text-xs font-semibold transition-all ${followed
+                                                onClick={(event) => {
+                                                    event.stopPropagation()
+                                                    handleFollow(creatorId)
+                                                }}
+                                                className={`relative z-20 h-8 min-w-[78px] rounded-lg border px-3 text-xs font-semibold transition-all ${followed
                                                     ? "border-white bg-white text-black"
                                                     : "border-white/70 bg-transparent text-white backdrop-blur-sm"
                                                     }`}
@@ -457,7 +460,7 @@ function HomeReels() {
                                     </div>
                                 </div>
 
-                                <div className="absolute bottom-16 left-2 right-2 z-10 hidden md:block md:bottom-1 md:left-4 md:right-4">
+                                <div className="absolute bottom-16 left-2 right-2 z-20 hidden md:block md:bottom-1 md:left-4 md:right-4">
                                     <div className="flex items-center gap-3">
                                         <img
                                             src={creator.avatar}
@@ -470,7 +473,10 @@ function HomeReels() {
 
                                         <button
                                             type="button"
-                                            onClick={() => handleFollow(creatorId)}
+                                            onClick={(event) => {
+                                                event.stopPropagation()
+                                                handleFollow(creatorId)
+                                            }}
                                             className={`relative z-20 h-8 min-w-[40px] rounded-2xl border px-3 text-[11px] leading-none transition-all ${followed
                                                 ? "border-white bg-white text-black"
                                                 : "border-white/75 bg-white/10 text-white backdrop-blur-sm"

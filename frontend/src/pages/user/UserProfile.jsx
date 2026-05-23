@@ -300,7 +300,11 @@ function UserProfile() {
 
                     {/* ======================= badges story section ==================== */}
 
-                    <section className="mt-6 flex gap-4 overflow-x-auto pb-4 md:mt-11 md:gap-6">
+                    <h2 className="mt-6 text-md font-semibold leading-5 text-[var(--color-text-primary)] md:mt-11">
+                        Badges
+                    </h2>
+
+                    <section className="mt-4 flex gap-4 overflow-x-auto pb-4 md:mt-3 md:gap-6">
                         <div className="w-[72px] shrink-0 text-center md:w-[84px]">
                             <div className="mx-auto flex h-[72px] w-[72px] items-center justify-center rounded-full border border-[var(--color-border-strong)] p-[3px] md:h-[84px] md:w-[84px]">
                                 <div className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]">

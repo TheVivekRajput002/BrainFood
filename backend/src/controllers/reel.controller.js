@@ -37,12 +37,12 @@ async function createReel(req, res) {
 }
 
 async function getReel(req, res) {
-    const reel = await reelModel.find({});
+    const reel = await reelModel.find({}).populate("creator");
     const follows = await followModel.find({ user: req.user._id }).select("creator");
     const followedCreatorIds = new Set(follows.map((f) => String(f.creator)));
 
     const reelWithFollowState = reel.map((r) => {
-        const creatorId = String(r.creator);
+        const creatorId = String(r.creator?._id ?? r.creator);
         return {
             ...r.toObject(),
             isFollowed: followedCreatorIds.has(creatorId)
