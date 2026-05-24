@@ -8,6 +8,8 @@ export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isCreateMenuOpen, setIsCreateMenuOpen] = React.useState(false);
+    const desktopCreateRef = React.useRef(null);
+    const mobileCreateRef = React.useRef(null);
     const [themeMode, setThemeMode] = React.useState(() => {
         const savedTheme = localStorage.getItem('themeMode');
         if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
@@ -41,6 +43,7 @@ export default function Layout() {
         <div className="min-h-screen bg-[var(--color-bg)]">
             <DesktopSidebar
                 canCreate={isCreator}
+                createButtonRef={desktopCreateRef}
                 onCreateClick={() => setIsCreateMenuOpen((prev) => !prev)}
                 themeMode={themeMode}
                 onToggleTheme={() => setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'))}
@@ -54,7 +57,11 @@ export default function Layout() {
             </main>
             
             <div className="fixed bottom-0 left-0 w-full z-50 md:hidden">
-                <BottomNav canCreate={isCreator} onCreateClick={() => setIsCreateMenuOpen((prev) => !prev)} />
+                <BottomNav
+                    canCreate={isCreator}
+                    createButtonRef={mobileCreateRef}
+                    onCreateClick={() => setIsCreateMenuOpen((prev) => !prev)}
+                />
             </div>
 
             {isCreator && (
@@ -62,6 +69,8 @@ export default function Layout() {
                     isOpen={isCreateMenuOpen}
                     onClose={() => setIsCreateMenuOpen(false)}
                     onSelect={handleCreateOptionSelect}
+                    desktopAnchorRef={desktopCreateRef}
+                    mobileAnchorRef={mobileCreateRef}
                 />
             )}
         </div>

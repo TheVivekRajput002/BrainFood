@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpenText, House, /* MessageCircle, Search, */ Plus, Trophy, User, Video } from 'lucide-react';
 
-export default function DesktopSidebar({ canCreate, onCreateClick, themeMode, onToggleTheme }) {
+export default function DesktopSidebar({ canCreate, createButtonRef, onCreateClick, themeMode, onToggleTheme }) {
     const { pathname } = useLocation();
     const role = localStorage.getItem('scs_role');
     const profilePath = role === 'creator' ? '/creator/profile' : '/user/profile';
@@ -52,6 +52,7 @@ export default function DesktopSidebar({ canCreate, onCreateClick, themeMode, on
 
                 {canCreate && (
                     <button
+                        ref={createButtonRef}
                         type="button"
                         title="Create"
                         onClick={onCreateClick}

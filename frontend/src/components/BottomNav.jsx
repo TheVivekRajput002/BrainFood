@@ -2,7 +2,7 @@ import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { BookOpenText, House, /* MessageCircle, Search, */ Plus, Trophy, User, Video } from 'lucide-react'
 
-function BottomNav({ canCreate, onCreateClick }) {
+function BottomNav({ canCreate, createButtonRef, onCreateClick }) {
     const location = useLocation()
     const currentPath = location.pathname
     const role = localStorage.getItem('scs_role')
@@ -89,6 +89,7 @@ function BottomNav({ canCreate, onCreateClick }) {
                 if (tab.isCreateAction) {
                     return (
                         <button
+                            ref={createButtonRef}
                             key={tab.name}
                             type="button"
                             onClick={onCreateClick}

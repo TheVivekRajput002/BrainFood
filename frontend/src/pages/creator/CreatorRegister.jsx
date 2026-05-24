@@ -47,6 +47,7 @@ function CreatorRegister() {
     const { showToast } = useToast()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [avatarPreview, setAvatarPreview] = useState(null)
+    const [avatarFile, setAvatarFile] = useState(null)
 
     useEffect(() => {
         return () => {
@@ -64,6 +65,7 @@ function CreatorRegister() {
         }
 
         if (avatarPreview) URL.revokeObjectURL(avatarPreview)
+        setAvatarFile(file)
         setAvatarPreview(URL.createObjectURL(file))
     }
 
@@ -87,6 +89,20 @@ function CreatorRegister() {
                 { name, email, password },
                 { withCredentials: true }
             )
+
+            if (avatarFile) {
+                const formData = new FormData()
+                formData.append('image', avatarFile)
+                try {
+                    await axios.post(
+                        `${import.meta.env.VITE_API_URL}/api/creator/profile-picture`,
+                        formData,
+                        { withCredentials: true }
+                    )
+                } catch {
+                    showToast('Account created, but profile photo could not be saved. You can upload it from your profile.', 'info')
+                }
+            }
 
             localStorage.setItem('scs_auth', 'true')
             localStorage.setItem('scs_role', 'creator')

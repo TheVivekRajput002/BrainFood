@@ -1,3 +1,4 @@
+import { useLayoutEffect, useState } from 'react'
 import { BookOpenText, Video } from 'lucide-react'
 
 const CREATE_OPTIONS = [
@@ -15,7 +16,48 @@ const CREATE_OPTIONS = [
     },
 ]
 
-export default function CreateQuickActions({ isOpen, onClose, onSelect }) {
+export default function CreateQuickActions({ isOpen, onClose, onSelect, desktopAnchorRef, mobileAnchorRef }) {
+    const [anchorPosition, setAnchorPosition] = useState(null)
+
+    useLayoutEffect(() => {
+        if (!isOpen) {
+            setAnchorPosition(null)
+            return
+        }
+
+        const updatePosition = () => {
+            const isDesktop = window.matchMedia('(min-width: 768px)').matches
+            const anchor = isDesktop ? desktopAnchorRef?.current : mobileAnchorRef?.current
+
+            if (!anchor || anchor.offsetParent === null) {
+                setAnchorPosition(null)
+                return
+            }
+
+            const rect = anchor.getBoundingClientRect()
+
+            if (isDesktop) {
+                setAnchorPosition({
+                    top: rect.top + rect.height / 2,
+                    left: rect.right + 12,
+                    transform: 'translateY(-50%)',
+                })
+                return
+            }
+
+            setAnchorPosition(null)
+        }
+
+        updatePosition()
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('scroll', updatePosition, true)
+
+        return () => {
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('scroll', updatePosition, true)
+        }
+    }, [isOpen, desktopAnchorRef, mobileAnchorRef])
+
     if (!isOpen) {
         return null
     }
@@ -26,13 +68,24 @@ export default function CreateQuickActions({ isOpen, onClose, onSelect }) {
                 type="button"
                 aria-label="Close create menu"
                 onClick={onClose}
-                className="fixed inset-0 z-40 bg-[var(--color-backdrop)]/50 backdrop-blur-[2px] md:bg-transparent md:backdrop-blur-none"
+                className="fixed inset-0 z-40 bg-[var(--color-backdrop)]/50 backdrop-blur-[2px]"
             />
 
             <div
                 role="dialog"
                 aria-label="Create content"
-                className="fixed z-50 w-[min(calc(100vw-2rem),220px)] left-1/2 -translate-x-1/2 bottom-[4.25rem] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-lg)] md:left-[100px] md:bottom-6 md:translate-x-0"
+                style={
+                    anchorPosition
+                        ? {
+                              top: anchorPosition.top,
+                              left: anchorPosition.left,
+                              transform: anchorPosition.transform,
+                          }
+                        : undefined
+                }
+                className={`fixed z-50 w-[min(calc(100vw-2rem),220px)] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-lg)] ${
+                    anchorPosition ? '' : 'left-1/2 -translate-x-1/2 bottom-[4.25rem]'
+                }`}
             >
                 <div className="border-b border-[var(--color-border)] px-3 py-2">
                     <p className="text-xs font-semibold text-[var(--color-text-primary)]">Create</p>
