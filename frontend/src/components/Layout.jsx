@@ -17,6 +17,7 @@ export default function Layout() {
     });
     const isCreator = localStorage.getItem('scs_role') === 'creator';
     const isImmersiveFeed = location.pathname === '/' || location.pathname === '/stack';
+    const isAchievements = location.pathname === '/achievements';
 
     React.useEffect(() => {
         document.documentElement.style.colorScheme = themeMode;
@@ -52,7 +53,13 @@ export default function Layout() {
             {/* The main content area grows to fill available space.
                 On mobile, padding-bottom ensures content isn't hidden behind the fixed BottomNav.
                 On MD breakpoint and up, padding is removed since BottomNav can be handled differently or hidden. */}
-            <main className={`min-h-screen overflow-y-auto md:pb-0 md:pl-[86px] ${isImmersiveFeed ? 'pb-0' : 'pb-[60px]'}`}>
+            <main
+                className={`min-h-screen overflow-y-auto overflow-x-hidden md:pb-0 md:pl-[86px] ${isImmersiveFeed ? 'pb-0' : 'pb-[60px]'} ${
+                    isAchievements
+                        ? '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+                        : ''
+                }`}
+            >
                 <Outlet />
             </main>
             
