@@ -62,7 +62,7 @@ async function getReel(req, res) {
 
             {
                 $sample: {
-                    size: 20
+                    size: 25
                 }
             },
 
@@ -83,6 +83,57 @@ async function getReel(req, res) {
             }
         ]);
 
+        const scoredReels = reels.map((reel) => {
+
+            let score =
+                (reel.likeCount * 2) +
+                (reel.bookmarkCount * 3);
+
+            const jitter =
+                Math.random() * (score * 0.15);
+
+            score += jitter;
+
+            return {
+                ...reel,
+                score
+            };
+        });
+
+        // sort by score
+        scoredReels.sort(
+            (a, b) => b.score - a.score
+        );
+
+        // creator diversity
+        const creatorCount = new Map();
+
+        const finalFeed = [];
+
+        for (const reel of scoredReels) {
+
+            const creatorId =
+                String(reel.creator._id);
+
+            const count =
+                creatorCount.get(creatorId) || 0;
+
+            if (count < 2) {
+
+                finalFeed.push(reel);
+
+                creatorCount.set(
+                    creatorId,
+                    count + 1
+                );
+            }
+
+            // top 20 only
+            if (finalFeed.length === 20) {
+                break;
+            }
+        }
+
         // Get followed creators
         const follows = await followModel
             .find({ user: user._id })
@@ -92,14 +143,11 @@ async function getReel(req, res) {
             follows.map((f) => String(f.creator))
         );
 
-        // Add isFollowed field
-        const reelWithFollowState = reels.map((r) => ({
+        const reelWithFollowState = finalFeed.map((r) => ({
             ...r,
-            isFollowed: followedCreatorIds.has(
-                String(r.creator?._id)
-            )
+            isFollowed: followedCreatorIds.has(String(r.creator?._id))
         }));
-
+        
         res.status(200).json({
             message: "reels fetched successfully",
             reel: reelWithFollowState
