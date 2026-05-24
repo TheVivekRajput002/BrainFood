@@ -38,32 +38,80 @@ async function createReel(req, res) {
 }
 
 async function getReel(req, res) {
-    const user = req.user
+    try {
+        const user = req.user;
 
-    //  get watched reels by user 
-    const watchedReels = await watchedReelModel.find({ user: user._id })
-    const watchedReelIds = watchedReels.map((watchedReel) => watchedReel.reel)
+        // Get watched reel ids
+        const watchedReels = await watchedReelModel
+            .find({ user: user._id })
+            .select("reel");
 
-    const reel = await reelModel.find({
-        _id: { $nin: watchedReelIds }
-    }).populate("creator");
+        const watchedReelIds = watchedReels.map(
+            (item) => item.reel
+        );
 
-    const follows = await followModel.find({ user: req.user._id }).select("creator");
-    const followedCreatorIds = new Set(follows.map((f) => String(f.creator)));
+        // Get random unwatched reels
+        const reels = await reelModel.aggregate([
+            {
+                $match: {
+                    _id: {
+                        $nin: watchedReelIds
+                    }
+                }
+            },
 
+            {
+                $sample: {
+                    size: 20
+                }
+            },
 
-    const reelWithFollowState = reel.map((r) => {
-        const creatorId = String(r.creator?._id ?? r.creator);
-        return {
-            ...r.toObject(),
-            isFollowed: followedCreatorIds.has(creatorId)
-        };
-    });
+            {
+                $lookup: {
+                    from: "creators",
+                    localField: "creator",
+                    foreignField: "_id",
+                    as: "creator"
+                }
+            },
 
-    res.status(200).json({
-        message: "reels fetched successfully",
-        reel: reelWithFollowState
-    })
+            {
+                $unwind: {
+                    path: "$creator",
+                    preserveNullAndEmptyArrays: true,
+                }
+            }
+        ]);
+
+        // Get followed creators
+        const follows = await followModel
+            .find({ user: user._id })
+            .select("creator");
+
+        const followedCreatorIds = new Set(
+            follows.map((f) => String(f.creator))
+        );
+
+        // Add isFollowed field
+        const reelWithFollowState = reels.map((r) => ({
+            ...r,
+            isFollowed: followedCreatorIds.has(
+                String(r.creator?._id)
+            )
+        }));
+
+        res.status(200).json({
+            message: "reels fetched successfully",
+            reel: reelWithFollowState
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
 }
 
 async function likeReel(req, res) {

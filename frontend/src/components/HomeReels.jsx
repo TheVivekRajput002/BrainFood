@@ -48,8 +48,18 @@ function HomeReels() {
     const [loadError, setLoadError] = useState('')
     const reelRefs = useRef({})
     const videoRefs = useRef({})
+    const progressBarRefs = useRef({})
+    const progressRafRef = useRef(null)
     const pendingActions = useRef(new Set())
     const watchedReelsReported = useRef(new Set())
+
+    const setProgressBarWidth = (reelId, percent) => {
+        const fill = progressBarRefs.current[String(reelId)]
+
+        if (fill) {
+            fill.style.width = `${percent}%`
+        }
+    }
 
     const WATCH_COMPLETE_THRESHOLD = 0.9
 
@@ -77,14 +87,15 @@ function HomeReels() {
     }
 
     const handleVideoTimeUpdate = (reelId, event) => {
-        if (String(reelId) !== String(activeReelId)) {
-            return
-        }
-
+        const reelKey = String(reelId)
         const video = event.currentTarget
         const { currentTime, duration } = video
 
         if (!duration || !Number.isFinite(duration)) {
+            return
+        }
+
+        if (reelKey !== String(activeReelId)) {
             return
         }
 
@@ -159,6 +170,38 @@ function HomeReels() {
     }, [videos])
 
     useEffect(() => {
+        const activeId = activeReelId ? String(activeReelId) : null
+
+        if (!activeId || pausedReels[activeId]) {
+            return undefined
+        }
+
+        const tick = () => {
+            const video =
+                videoRefs.current[activeReelId] ||
+                videoRefs.current[activeId]
+            const { currentTime, duration } = video || {}
+
+            if (video && duration && Number.isFinite(duration)) {
+                setProgressBarWidth(activeId, Math.min(100, (currentTime / duration) * 100))
+            }
+
+            progressRafRef.current = requestAnimationFrame(tick)
+        }
+
+        progressRafRef.current = requestAnimationFrame(tick)
+
+        return () => {
+            if (progressRafRef.current) {
+                cancelAnimationFrame(progressRafRef.current)
+                progressRafRef.current = null
+            }
+        }
+    }, [activeReelId, pausedReels])
+
+    useEffect(() => {
+        const inactiveReelIds = []
+
         videos.forEach((reel) => {
             const videoElement = videoRefs.current[reel._id]
 
@@ -187,7 +230,10 @@ function HomeReels() {
 
             videoElement.pause()
             videoElement.currentTime = 0
+            inactiveReelIds.push(reelId)
         })
+
+        inactiveReelIds.forEach((reelId) => setProgressBarWidth(reelId, 0))
     }, [activeReelId, mutedReels, pausedReels, videos])
 
     useEffect(() => {
@@ -654,6 +700,21 @@ function HomeReels() {
                                             )}
                                         </button>
                                     </div>
+                                </div>
+
+                                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-px bg-white/25">
+                                    <div
+                                        ref={(element) => {
+                                            if (element) {
+                                                progressBarRefs.current[reelId] = element
+                                                return
+                                            }
+
+                                            delete progressBarRefs.current[reelId]
+                                        }}
+                                        className="h-full bg-white will-change-[width]"
+                                        style={{ width: '0%' }}
+                                    />
                                 </div>
                             </div>
 
