@@ -433,6 +433,32 @@
     animation: toast-enter 0.25s ease-out;
 }
 
+@keyframes home-reel-like-burst {
+    0% {
+        opacity: 0;
+        transform: scale(0.35);
+    }
+
+    18% {
+        opacity: 1;
+        transform: scale(1.12);
+    }
+
+    35% {
+        opacity: 1;
+        transform: scale(0.96);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+.home-reel-like-burst {
+    animation: home-reel-like-burst 0.75s ease-out forwards;
+}
+
 .user-login-shell {
     min-height: 100dvh;
     display: flex;
