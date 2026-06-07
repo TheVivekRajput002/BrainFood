@@ -3,6 +3,19 @@ const creatorModel = require("../models/creator.model")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 
+const isProduction = process.env.NODE_ENV === "production";
+const COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+};
+const CLEAR_COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax"
+};
+
 async function registerUser(req, res) {
     try {
         const { name, username, email, password } = req.body
@@ -43,12 +56,7 @@ async function registerUser(req, res) {
             id: user._id
         }, process.env.JWT_SECRET)
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie("token", token, COOKIE_OPTIONS);
 
         res.status(201).json({
             message: "user registered successfully",
@@ -92,12 +100,7 @@ async function loginUser(req, res) {
             id: user._id
         }, process.env.JWT_SECRET)
 
-        res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000
-});
+        res.cookie("token", token, COOKIE_OPTIONS);
 
         res.status(200).json({
             message: "logged in successfully",
@@ -117,7 +120,7 @@ async function loginUser(req, res) {
 }
 
 function logoutUser(req, res) {
-    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "none" });
+    res.clearCookie("token", CLEAR_COOKIE_OPTIONS);
     res.status(200).json({
         message: "logged out successfully"
     })
@@ -155,12 +158,7 @@ async function registerCreator(req, res) {
             id: creator._id
         }, process.env.JWT_SECRET)
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie("token", token, COOKIE_OPTIONS);
 
         res.status(201).json({
             message: "creator registered successfully",
@@ -211,12 +209,7 @@ async function loginCreator(req, res) {
             id: creator._id
         }, process.env.JWT_SECRET)
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie("token", token, COOKIE_OPTIONS);
 
         res.status(201).json({
             message: "logged in succesfuly",
@@ -236,7 +229,7 @@ async function loginCreator(req, res) {
 }
 
 function logoutCreator(req, res) {
-    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "none" });
+    res.clearCookie("token", CLEAR_COOKIE_OPTIONS);
     res.status(200).json({
         message: "food partner logged out successfully"
     })

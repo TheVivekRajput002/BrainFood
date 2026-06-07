@@ -7,10 +7,11 @@ const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 
+const isProduction = process.env.NODE_ENV === "production";
 const AUTH_COOKIE_OPTIONS = {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 
@@ -117,14 +118,14 @@ async function googleCallback(req, res) {
 
         res.clearCookie("oauth_state", {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
         })
         const returnPath = req.cookies.oauth_return_to === "register" ? "/user/register" : "/user/login"
         res.clearCookie("oauth_return_to", {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
         })
 
         const tokenBody = new URLSearchParams({

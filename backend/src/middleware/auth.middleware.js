@@ -15,6 +15,12 @@ async function authCreatorMiddleware(req, res, next) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         const creator = await creatorModel.findById(decoded.id);
 
+        if (!creator) {
+            return res.status(401).json({
+                message: "creator account not found"
+            })
+        }
+
         req.creator = creator
 
         next()
