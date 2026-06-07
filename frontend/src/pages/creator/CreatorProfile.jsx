@@ -99,8 +99,10 @@ export default function CreatorProfile() {
                 console.error('Error fetching creator profile', fetchError)
                 setError('Creator profile could not be loaded.')
                 setLoading(false)
+                localStorage.removeItem('scs_auth')
+                navigate('/creator/login', { replace: true })
             })
-    }, [])
+    }, [navigate])
 
     if (loading) {
         return (

@@ -89,6 +89,7 @@ function UserProfile() {
             })
             .catch(() => {
                 setLoading(false)
+                localStorage.removeItem('scs_auth')
                 navigate('/user/login', { replace: true })
             })
     }, [navigate])
@@ -122,10 +123,11 @@ function UserProfile() {
     const handleLogout = async () => {
         try {
             await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/user/logout`, { withCredentials: true })
-            localStorage.removeItem('scs_auth')
-            navigate('/user/login')
         } catch (errorLogMsg) {
             console.error('Logout failed', errorLogMsg)
+        } finally {
+            localStorage.removeItem('scs_auth')
+            navigate('/user/login')
         }
     }
 
@@ -133,10 +135,10 @@ function UserProfile() {
         setShowCreatorPrompt(false)
         try {
             await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/user/logout`, { withCredentials: true })
-            localStorage.removeItem('scs_auth')
-            navigate('/creator/register', { replace: true })
         } catch (errorLogMsg) {
             console.error('Logout failed', errorLogMsg)
+        } finally {
+            localStorage.removeItem('scs_auth')
             navigate('/creator/register', { replace: true })
         }
     }
@@ -175,7 +177,6 @@ function UserProfile() {
     const streak = Number(user.streak) || 0
     const profileImage = user.profile_picture || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80'
     const bio = user.bio || "new user"
-    const insightsCta = 'View Insights'
     const completedBadges = badges.filter((badge) => badge.completed)
 
     return (

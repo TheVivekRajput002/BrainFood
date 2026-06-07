@@ -29,8 +29,10 @@ function EditCreatorProfile() {
             })
             .catch(() => {
                 setCreator(null)
+                localStorage.removeItem('scs_auth')
+                navigate('/creator/login', { replace: true })
             })
-    }, [])
+    }, [navigate])
 
     useEffect(() => {
         return () => {
@@ -98,10 +100,11 @@ function EditCreatorProfile() {
     const handleLogout = async () => {
         try {
             await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/creator/logout`, { withCredentials: true })
-            localStorage.removeItem('scs_auth')
-            navigate('/creator/login', { replace: true })
         } catch (errorLogMsg) {
             console.error('Logout failed', errorLogMsg)
+        } finally {
+            localStorage.removeItem('scs_auth')
+            navigate('/creator/login', { replace: true })
         }
     }
 

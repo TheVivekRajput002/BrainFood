@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { showUnlockedBadges } from '../../utils/badgeToasts'
 import {
@@ -17,6 +18,7 @@ import {
 } from './reelUtils'
 
 export function useReelFeed(showToast) {
+    const navigate = useNavigate()
     const [videos, setVideos] = useState([])
     const [liked, setLiked] = useState({})
     const [saved, setSaved] = useState({})
@@ -153,6 +155,19 @@ export function useReelFeed(showToast) {
         fetchReelPage()
             .catch((error) => {
                 console.error('Failed to load reels:', error)
+                
+                const isAuthError =
+                    error.response?.status === 401 ||
+                    error.response?.status === 400;
+
+                if (isAuthError) {
+                    localStorage.removeItem('scs_auth')
+                    const role = localStorage.getItem('scs_role')
+                    const redirectPath = role === 'creator' ? '/creator/login' : '/user/login'
+                    navigate(redirectPath, { replace: true })
+                    return
+                }
+
                 setVideos([])
                 setNextCursor(null)
                 setHasMore(false)
@@ -163,7 +178,7 @@ export function useReelFeed(showToast) {
             .finally(() => {
                 setLoading(false)
             })
-    }, [fetchReelPage])
+    }, [fetchReelPage, navigate])
 
     useEffect(() => {
         if (loading || !hasMore || !nextCursor) {

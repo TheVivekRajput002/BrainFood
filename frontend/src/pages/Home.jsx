@@ -1,5 +1,6 @@
 import React from 'react'
 import { useEffect } from "react"
+import axios from 'axios'
 import HomeReels from '../components/HomeReels'
 
 function Home() {
@@ -9,7 +10,7 @@ function Home() {
             try {
                 await axios.get(`${import.meta.env.VITE_BASE_URL}/api/health`)
                 console.log("Backend awake");
-            } catch (error) {
+            } catch {
                 console.log("Wakeup failed");
             }
         };

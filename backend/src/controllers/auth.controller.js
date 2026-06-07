@@ -124,89 +124,115 @@ function logoutUser(req, res) {
 }
 
 async function registerCreator(req, res) {
-    const { name, email, password } = req.body
+    try {
+        const { name, email, password } = req.body
 
-    const isCreatorAlreadyExists = await creatorModel.findOne({
-        email
-    });
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                message: "All fields are required"
+            })
+        }
 
-    if (isCreatorAlreadyExists) {
-        return res.status(400).json({
-            message: "food partner already exists"
+        const isCreatorAlreadyExists = await creatorModel.findOne({
+            email
+        });
+
+        if (isCreatorAlreadyExists) {
+            return res.status(400).json({
+                message: "food partner already exists"
+            })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        const creator = await creatorModel.create({
+            name,
+            email,
+            password: hashedPassword
+        })
+
+        const token = jwt.sign({
+            id: creator._id
+        }, process.env.JWT_SECRET)
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(201).json({
+            message: "creator registered successfully",
+            creator: {
+                _id: creator._id,
+                email: creator.email,
+                name: creator.name
+            }
+        })
+    } catch (err) {
+        console.error("Creator registration error:", err);
+        res.status(500).json({
+            message: "Creator registration failed",
+            error: err.message
         })
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    const creator = await creatorModel.create({
-        name,
-        email,
-        password: hashedPassword
-    })
-
-    const token = jwt.sign({
-        id: creator._id
-    }, process.env.JWT_SECRET)
-
-   res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000
-});
-
-    res.status(201).json({
-        message: "creator registered successfully",
-        creator: {
-            _id: creator._id,
-            email: creator.email,
-            name: creator.name
-        }
-    })
-
 }
 
 async function loginCreator(req, res) {
-    const { email, password } = req.body
+    try {
+        const { email, password } = req.body
 
-    const creator = await creatorModel.findOne({
-        email
-    })
-
-    if (!creator) {
-        return res.status(400).json({
-            message: "invalid email or password"
-        })
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, creator.password);
-
-    if (!isPasswordValid) {
-        return res.status(400).json({
-            message: "invalid email or password"
-        })
-    }
-
-    const token = jwt.sign({
-        id: creator._id
-    }, process.env.JWT_SECRET)
-
-  res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000
-});
-
-    res.status(201).json({
-        message: "logged in succesfuly",
-        creator: {
-            _id: creator._id,
-            email: creator.email,
-            name: creator.name
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required"
+            })
         }
-    })
 
+        const creator = await creatorModel.findOne({
+            email
+        })
+
+        if (!creator) {
+            return res.status(400).json({
+                message: "invalid email or password"
+            })
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, creator.password);
+
+        if (!isPasswordValid) {
+            return res.status(400).json({
+                message: "invalid email or password"
+            })
+        }
+
+        const token = jwt.sign({
+            id: creator._id
+        }, process.env.JWT_SECRET)
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(201).json({
+            message: "logged in succesfuly",
+            creator: {
+                _id: creator._id,
+                email: creator.email,
+                name: creator.name
+            }
+        })
+    } catch (err) {
+        console.error("Creator login error:", err);
+        res.status(500).json({
+            message: "Creator login failed",
+            error: err.message
+        })
+    }
 }
 
 function logoutCreator(req, res) {
