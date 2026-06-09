@@ -51,7 +51,9 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.send("hello world" )
+    res.status(200).json({
+        message:"backend is working"
+    })
 })
 
 app.use("/api/auth", authLimiter)
