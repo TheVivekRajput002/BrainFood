@@ -7,6 +7,7 @@ const { uploadFile } = require("../services/storage.service")
 const { checkAchievements } = require("../services/achievement.service")
 const jwt = require("jsonwebtoken")
 const { v4: uuid } = require("uuid")
+const posthog = require("../lib/posthog")
 
 async function getCreatorById(req, res) {
     const creatorId = req.params.id
@@ -71,15 +72,26 @@ async function followCreator(req, res) {
         await followModel.deleteOne({ user: userId, creator: creatorId });
         await userModel.findByIdAndUpdate(userId, { $inc: { followingCount: -1 } })
         await creatorModel.findByIdAndUpdate(creatorId, { $inc: { followersCount: -1 } })
+        posthog.capture({
+            distinctId: String(userId),
+            event: "creator unfollowed",
+            properties: { creator_id: String(creatorId) },
+        })
         return res.json({ success: true, action: "unfollowed" });
-        
+
     } else {
-        
+
         await followModel.create({ user: userId, creator: creatorId });
         await userModel.findByIdAndUpdate(userId, { $inc: { followingCount: +1 } })
         await creatorModel.findByIdAndUpdate(creatorId, { $inc: { followersCount: +1 } })
 
         const unlocked = await checkAchievements(userId, "USER_FOLLOWED")
+
+        posthog.capture({
+            distinctId: String(userId),
+            event: "creator followed",
+            properties: { creator_id: String(creatorId) },
+        })
 
         return res.json({
             success: true,

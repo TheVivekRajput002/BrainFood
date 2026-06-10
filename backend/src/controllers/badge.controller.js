@@ -2,6 +2,7 @@ const mongoose = require("mongoose")
 const badgeModel = require("../models/badge.model")
 const userBadgeModel = require("../models/userBadge.model")
 const { awardBadge } = require("../services/achievement.service")
+const posthog = require("../lib/posthog")
 
 function getErrorMessage(error) {
     if (error?.code === 11000) {
@@ -54,11 +55,22 @@ async function completeBadge(req, res) {
 
         const userBadge = await awardBadge(user._id, badge)
 
+        posthog.capture({
+            distinctId: String(user._id),
+            event: "badge completed",
+            properties: {
+                badge_id: String(badge._id),
+                badge_name: badge.name,
+                badge_event: badge.event,
+            },
+        })
+
         res.status(200).json({
             success: true,
             userBadge
         })
     } catch (error) {
+        posthog.captureException(error, req.user ? String(req.user._id) : undefined, { endpoint: "/api/badge/complete" })
         res.status(400).json({
             success: false,
             message: getErrorMessage(error)

@@ -10,6 +10,7 @@ const {
     recordReelWatch,
 } = require("../services/achievement.service")
 const { v4: uuid } = require("uuid")
+const posthog = require("../lib/posthog")
 
 const REEL_PAGE_DEFAULT = 10
 const REEL_PAGE_MAX = 20
@@ -112,6 +113,12 @@ async function createReel(req, res) {
         video: videoUrl,
         creator: req.creator._id,
         thumbnail: thumbnailUploadResult.url
+    })
+
+    posthog.capture({
+        distinctId: String(req.creator._id),
+        event: "reel created",
+        properties: { reel_id: String(reel._id), reel_name: reel.name },
     })
 
     res.status(201).json({
@@ -223,6 +230,12 @@ async function likeReel(req, res) {
                 $inc: { likeCount: -1 }
             })
 
+            posthog.capture({
+                distinctId: String(user._id),
+                event: "reel unliked",
+                properties: { reel_id: String(reelId) },
+            })
+
             return res.status(200).json({ message: "reel unliked successfully", like: false })
         }
 
@@ -235,9 +248,16 @@ async function likeReel(req, res) {
             $inc: { likeCount: 1 }
         })
 
+        posthog.capture({
+            distinctId: String(user._id),
+            event: "reel liked",
+            properties: { reel_id: String(reelId) },
+        })
+
         res.status(200).json({ message: "reel liked successfully", like: true })
     } catch (error) {
         console.log(error)
+        posthog.captureException(error, req.user ? String(req.user._id) : undefined, { endpoint: "/api/reel/like" })
         res.status(500).json({ message: "something went wrong", error: error.message })
     }
 }
@@ -261,6 +281,11 @@ async function saveReel(req, res) {
             await reelModel.findByIdAndUpdate(reelId, {
                 $inc: { bookmarkCount: -1 }
             })
+            posthog.capture({
+                distinctId: String(user._id),
+                event: "reel unsaved",
+                properties: { reel_id: String(reelId) },
+            })
             return res.status(200).json({ message: "reel unsaved successfully" })
         }
 
@@ -275,6 +300,12 @@ async function saveReel(req, res) {
 
         const unlocked = await checkAchievements(user._id, "REEL_SAVED")
 
+        posthog.capture({
+            distinctId: String(user._id),
+            event: "reel saved",
+            properties: { reel_id: String(reelId) },
+        })
+
         res.status(201).json({
             message: "reel saved successfully",
             save,
@@ -282,6 +313,7 @@ async function saveReel(req, res) {
         })
     } catch (error) {
         console.log("there is some error in saving unsaving reel", error)
+        posthog.captureException(error, req.user ? String(req.user._id) : undefined, { endpoint: "/api/reel/save" })
     }
 
 
@@ -315,12 +347,19 @@ async function watchReel(req, res) {
 
         const unlocked = await checkAchievements(userId, "REEL_WATCHED")
 
+        posthog.capture({
+            distinctId: String(userId),
+            event: "reel watched",
+            properties: { reel_id: String(reelId) },
+        })
+
         res.status(200).json({
             success: true,
             unlockedBadges: unlocked.map((entry) => entry.badge),
         })
     } catch (error) {
         console.error("error recording reel watch", error)
+        posthog.captureException(error, req.user ? String(req.user._id) : undefined, { endpoint: "/api/reel/watch" })
         res.status(500).json({
             success: false,
             message: "something went wrong",

@@ -11,6 +11,7 @@ const badgeRoutes = require("./routes/badge.route")
 const cors = require("cors")
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const posthog = require("./lib/posthog")
 
 
 const app = express()
@@ -66,6 +67,19 @@ app.use("/api/reel", reelRoutes)
 app.use("/api/stack", stackRoutes)
 app.use("/api/creator", creatorRoutes)
 app.use("/api/badge", badgeRoutes)
+
+app.use((err, req, res, next) => {
+    const distinctId = req.user?._id
+        ? String(req.user._id)
+        : req.creator?._id
+            ? String(req.creator._id)
+            : undefined
+    posthog.captureException(err, distinctId, {
+        method: req.method,
+        path: req.path,
+    })
+    res.status(500).json({ message: "Internal server error" })
+})
 
 module.exports = app;
 

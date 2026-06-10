@@ -2,6 +2,7 @@ const crypto = require("crypto")
 const axios = require("axios")
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/user.model")
+const posthog = require("../lib/posthog")
 
 const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -62,23 +63,38 @@ async function findOrCreateUser(googleUser) {
     }
 
     let dbUser = await userModel.findOne({ email })
+    let isNewUser = false
 
-    if (dbUser) {
-        return dbUser
+    if (!dbUser) {
+        const username = await generateUniqueUsername(email)
+        const createPayload = {
+            name: googleUser.name || email.split("@")[0],
+            username,
+            email,
+        }
+
+        if (googleUser.picture) {
+            createPayload.profile_picture = googleUser.picture
+        }
+
+        dbUser = await userModel.create(createPayload)
+        isNewUser = true
     }
 
-    const username = await generateUniqueUsername(email)
-    const createPayload = {
-        name: googleUser.name || email.split("@")[0],
-        username,
-        email,
-    }
+    posthog.identify({
+        distinctId: String(dbUser._id),
+        properties: {
+            $set: { name: dbUser.name, email: dbUser.email, username: dbUser.username },
+            $set_once: isNewUser ? { created_at: new Date().toISOString() } : undefined,
+        },
+    })
+    posthog.capture({
+        distinctId: String(dbUser._id),
+        event: "google oauth completed",
+        properties: { is_new_user: isNewUser, login_method: "google" },
+    })
 
-    if (googleUser.picture) {
-        createPayload.profile_picture = googleUser.picture
-    }
-
-    return userModel.create(createPayload)
+    return dbUser
 }
 
 function redirectGoogle(req, res) {
@@ -155,6 +171,7 @@ async function googleCallback(req, res) {
         res.redirect(`${getFrontendUrl()}${returnPath}?oauth=success`)
     } catch (err) {
         console.error("Google OAuth callback error:", err.response?.data || err.message)
+        posthog.captureException(err, undefined, { endpoint: "/auth/callback" })
         redirectToLogin(res, "Google sign-in failed. Please try again.")
     }
 }

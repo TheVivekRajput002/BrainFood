@@ -4,6 +4,7 @@ const {
     checkAchievements,
     recordStackRead,
 } = require("../services/achievement.service")
+const posthog = require("../lib/posthog")
 
 async function createStack(req, res) {
     const creator = req.creator
@@ -46,12 +47,23 @@ async function createStack(req, res) {
             cards: createdCards.map((card) => card._id)
         }, { new: true })
 
+        posthog.capture({
+            distinctId: String(creator._id),
+            event: "stack created",
+            properties: {
+                stack_id: String(newStack._id),
+                stack_title: newStack.title,
+                card_count: createdCards.length,
+            },
+        })
+
         res.status(201).json({
             success: true,
             stack: newStack
         })
 
     } catch (error) {
+        posthog.captureException(error, req.creator ? String(req.creator._id) : undefined, { endpoint: "/api/stack" })
         res.status(400).json({
             success: false,
             error: error
@@ -114,11 +126,21 @@ async function markStackRead(req, res) {
 
         const unlocked = await checkAchievements(userId, "STACK_READ")
 
+        posthog.capture({
+            distinctId: String(userId),
+            event: "stack read",
+            properties: {
+                stack_id: String(stackId),
+                stack_title: stack.title,
+            },
+        })
+
         res.status(200).json({
             success: true,
             unlockedBadges: unlocked.map((entry) => entry.badge),
         })
     } catch (error) {
+        posthog.captureException(error, req.user ? String(req.user._id) : undefined, { endpoint: "/api/stack/read" })
         res.status(400).json({
             success: false,
             error: error.message,

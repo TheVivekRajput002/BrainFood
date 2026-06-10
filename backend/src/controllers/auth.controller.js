@@ -2,6 +2,7 @@ const userModel = require("../models/user.model")
 const creatorModel = require("../models/creator.model")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
+const posthog = require("../lib/posthog")
 
 const isProduction = process.env.NODE_ENV === "production";
 const COOKIE_OPTIONS = {
@@ -58,6 +59,19 @@ async function registerUser(req, res) {
 
         res.cookie("token", token, COOKIE_OPTIONS);
 
+        posthog.identify({
+            distinctId: String(user._id),
+            properties: {
+                $set: { name: user.name, email: user.email, username: user.username },
+                $set_once: { created_at: new Date().toISOString() },
+            },
+        })
+        posthog.capture({
+            distinctId: String(user._id),
+            event: "user registered",
+            properties: { registration_method: "email", username: user.username },
+        })
+
         res.status(201).json({
             message: "user registered successfully",
             user: {
@@ -69,6 +83,7 @@ async function registerUser(req, res) {
         })
     } catch (err) {
         console.error("Registration error:", err);
+        posthog.captureException(err, undefined, { endpoint: "/api/auth/register" })
         res.status(500).json({
             message: "Registration failed",
             error: err.message
@@ -102,6 +117,18 @@ async function loginUser(req, res) {
 
         res.cookie("token", token, COOKIE_OPTIONS);
 
+        posthog.identify({
+            distinctId: String(user._id),
+            properties: {
+                $set: { name: user.name, email: user.email, username: user.username },
+            },
+        })
+        posthog.capture({
+            distinctId: String(user._id),
+            event: "user logged in",
+            properties: { login_method: "email" },
+        })
+
         res.status(200).json({
             message: "logged in successfully",
             user: {
@@ -112,6 +139,7 @@ async function loginUser(req, res) {
         })
     } catch (err) {
         console.error("Login error:", err);
+        posthog.captureException(err, undefined, { endpoint: "/api/auth/login" })
         res.status(500).json({
             message: "Login failed",
             error: err.message
@@ -120,6 +148,17 @@ async function loginUser(req, res) {
 }
 
 function logoutUser(req, res) {
+    try {
+        const token = req.cookies?.token
+        if (token) {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+            if (decoded?.id) {
+                posthog.capture({ distinctId: String(decoded.id), event: "user logged out" })
+            }
+        }
+    } catch {
+        // token invalid or expired — skip tracking
+    }
     res.clearCookie("token", CLEAR_COOKIE_OPTIONS);
     res.status(200).json({
         message: "logged out successfully"
@@ -160,6 +199,19 @@ async function registerCreator(req, res) {
 
         res.cookie("token", token, COOKIE_OPTIONS);
 
+        posthog.identify({
+            distinctId: String(creator._id),
+            properties: {
+                $set: { name: creator.name, email: creator.email, account_type: "creator" },
+                $set_once: { created_at: new Date().toISOString() },
+            },
+        })
+        posthog.capture({
+            distinctId: String(creator._id),
+            event: "creator registered",
+            properties: { registration_method: "email" },
+        })
+
         res.status(201).json({
             message: "creator registered successfully",
             creator: {
@@ -170,6 +222,7 @@ async function registerCreator(req, res) {
         })
     } catch (err) {
         console.error("Creator registration error:", err);
+        posthog.captureException(err, undefined, { endpoint: "/api/auth/creator/register" })
         res.status(500).json({
             message: "Creator registration failed",
             error: err.message
@@ -211,6 +264,18 @@ async function loginCreator(req, res) {
 
         res.cookie("token", token, COOKIE_OPTIONS);
 
+        posthog.identify({
+            distinctId: String(creator._id),
+            properties: {
+                $set: { name: creator.name, email: creator.email, account_type: "creator" },
+            },
+        })
+        posthog.capture({
+            distinctId: String(creator._id),
+            event: "creator logged in",
+            properties: { login_method: "email" },
+        })
+
         res.status(201).json({
             message: "logged in succesfuly",
             creator: {
@@ -221,6 +286,7 @@ async function loginCreator(req, res) {
         })
     } catch (err) {
         console.error("Creator login error:", err);
+        posthog.captureException(err, undefined, { endpoint: "/api/auth/creator/login" })
         res.status(500).json({
             message: "Creator login failed",
             error: err.message
@@ -229,6 +295,17 @@ async function loginCreator(req, res) {
 }
 
 function logoutCreator(req, res) {
+    try {
+        const token = req.cookies?.token
+        if (token) {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+            if (decoded?.id) {
+                posthog.capture({ distinctId: String(decoded.id), event: "creator logged out" })
+            }
+        }
+    } catch {
+        // token invalid or expired — skip tracking
+    }
     res.clearCookie("token", CLEAR_COOKIE_OPTIONS);
     res.status(200).json({
         message: "food partner logged out successfully"
