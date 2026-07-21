@@ -133,11 +133,25 @@ async function getReel(req, res) {
         const limit = parseReelPageLimit(req.query.limit)
         const cursorExcludeIds = parseReelFeedCursor(req.query.cursor)
 
-        const watchedReels = await watchedReelModel
-            .find({ user: user._id })
-            .select("reel")
+        let watchedReelIds = []
+        let followedCreatorIds = new Set()
 
-        const watchedReelIds = watchedReels.map((item) => item.reel)
+        if (user) {
+            const watchedReels = await watchedReelModel
+                .find({ user: user._id })
+                .select("reel")
+
+            watchedReelIds = watchedReels.map((item) => item.reel)
+
+            const follows = await followModel
+                .find({ user: user._id })
+                .select("creator")
+
+            followedCreatorIds = new Set(
+                follows.map((f) => String(f.creator))
+            )
+        }
+
         const excludeIds = toUniqueObjectIds([
             ...watchedReelIds,
             ...cursorExcludeIds,
@@ -182,14 +196,6 @@ async function getReel(req, res) {
 
         const hasMore = remainingCount > 0
         const nextCursor = hasMore ? buildReelFeedCursor(nextExcludeIds) : null
-
-        const follows = await followModel
-            .find({ user: user._id })
-            .select("creator")
-
-        const followedCreatorIds = new Set(
-            follows.map((f) => String(f.creator))
-        )
 
         const reelWithFollowState = page.map(({ score, ...reel }) => ({
             ...reel,

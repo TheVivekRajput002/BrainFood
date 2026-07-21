@@ -34,10 +34,15 @@ function AppRoutes() {
         <Route path='/creator/register' element={<CreatorRegister />} />
         <Route path='/creator/login' element={<CreatorLogin />} />
 
+        {/* Public Routes with Navigation Layout */}
+        <Route element={<Layout />}>
+          <Route path='/' element={<Home />} />
+        </Route>
+
         {/* Protected Routes requiring Authentication */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path='/' element={<Home />} />
+
             <Route path='/search' element={<Search />} />
             <Route path='/stack' element={<StackScroll />} />
             <Route path='/stack/create' element={<StackCreate />} />

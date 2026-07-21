@@ -26,6 +26,10 @@ export function useReelActions({
     const pendingActions = useRef(new Set())
 
     const handleFollow = async (creatorId) => {
+        if (!localStorage.getItem('scs_auth')) {
+            showToast("Please login to use this feature", "error")
+            return
+        }
         if (!creatorId) return
 
         const actionKey = `follow-${creatorId}`
@@ -60,6 +64,10 @@ export function useReelActions({
     }
 
     const handleLikeClick = async (reel) => {
+        if (!localStorage.getItem('scs_auth')) {
+            showToast("Please login to use this feature", "error")
+            return
+        }
         const reelId = reel._id
         const actionKey = `like-${reelId}`
         if (pendingActions.current.has(actionKey)) return
@@ -100,6 +108,10 @@ export function useReelActions({
     }
 
     const handleSaveClick = async (reel) => {
+        if (!localStorage.getItem('scs_auth')) {
+            showToast("Please login to use this feature", "error")
+            return
+        }
         const reelId = reel._id
         const actionKey = `save-${reelId}`
         if (pendingActions.current.has(actionKey)) return
